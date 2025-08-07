@@ -1,0 +1,62 @@
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_cors import CORS
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Initialize extensions
+db = SQLAlchemy()
+login_manager = LoginManager()
+
+def create_app(config_name='development'):
+    """Application factory pattern"""
+    app = Flask(__name__)
+    
+    # Configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///chargebnb.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # OAuth Configuration
+    app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
+    app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
+    app.config['FACEBOOK_APP_ID'] = os.getenv('FACEBOOK_APP_ID')
+    app.config['FACEBOOK_APP_SECRET'] = os.getenv('FACEBOOK_APP_SECRET')
+    app.config['LINKEDIN_CLIENT_ID'] = os.getenv('LINKEDIN_CLIENT_ID')
+    app.config['LINKEDIN_CLIENT_SECRET'] = os.getenv('LINKEDIN_CLIENT_SECRET')
+    
+    # Initialize extensions with app
+    db.init_app(app)
+    login_manager.init_app(app)
+    CORS(app)
+    
+    # Configure Flask-Login
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Please log in to access this page.'
+    
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        from models.user import User
+        return User.query.get(int(user_id))
+
+    # Custom unauthorized handler: 401 for API/JSON, else redirect
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        from flask import request, jsonify, redirect, url_for
+        if request.accept_mimetypes.accept_json or request.path.startswith('/api/'):
+            return jsonify({"error": "Authentication required", "providers": ["google", "facebook", "linkedin"]}), 401
+        return redirect(url_for(login_manager.login_view))
+    
+    # Register blueprints
+    from routes.auth import auth_bp
+    from routes.api import api_bp
+    
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(api_bp, url_prefix='/api')
+    
+    return app
