@@ -246,7 +246,7 @@ class TestAuthRoutes:
     
     def test_logout_requires_login(self, client):
         """Test that logout requires authentication"""
-        response = client.post('/auth/logout')
+        response = client.post('/auth/logout', headers={"Accept": "application/json"})
         assert response.status_code == 401
     
     def test_logout_success(self, client, app, sample_user):
@@ -262,7 +262,7 @@ class TestAuthRoutes:
     
     def test_get_current_user_requires_login(self, client):
         """Test that getting current user requires authentication"""
-        response = client.get('/auth/user')
+        response = client.get('/auth/user', headers={"Accept": "application/json"})
         assert response.status_code == 401
     
     def test_get_current_user_success(self, client, app, sample_user):

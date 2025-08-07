@@ -6,8 +6,18 @@ from models.user import User
 from services.oauth import OAuthService
 from app import db
 
+
 auth_bp = Blueprint('auth', __name__)
 oauth_service = OAuthService()
+
+# Provider-less login route for Flask-Login redirects
+@auth_bp.route('/login')
+def login():
+    """Generic login route for Flask-Login redirects (no provider required)."""
+    # If you have a login page, render it here. For API, return JSON error.
+    if request.accept_mimetypes.accept_json:
+        return jsonify({"error": "Authentication required", "providers": ["google", "facebook", "linkedin"]}), 401
+    return "<h1>Authentication required</h1><p>Please login with one of the supported OAuth providers.</p>", 401
 
 @auth_bp.record
 def record_auth(setup_state):
@@ -42,7 +52,8 @@ def oauth_callback(provider):
         return jsonify({'error': 'Unsupported OAuth provider'}), 400
     
     # Verify state for CSRF protection
-    if request.args.get('state') != session.get('oauth_state'):
+    state = request.args.get('state')
+    if not state or state != session.get('oauth_state'):
         return jsonify({'error': 'Invalid state parameter'}), 400
     
     if request.args.get('error'):

@@ -38,10 +38,19 @@ def create_app(config_name='development'):
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
     
+
     @login_manager.user_loader
     def load_user(user_id):
         from models.user import User
         return User.query.get(int(user_id))
+
+    # Custom unauthorized handler: 401 for API/JSON, else redirect
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        from flask import request, jsonify, redirect, url_for
+        if request.accept_mimetypes.accept_json or request.path.startswith('/api/'):
+            return jsonify({"error": "Authentication required", "providers": ["google", "facebook", "linkedin"]}), 401
+        return redirect(url_for(login_manager.login_view))
     
     # Register blueprints
     from routes.auth import auth_bp

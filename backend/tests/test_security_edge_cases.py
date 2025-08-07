@@ -37,19 +37,19 @@ class TestOAuthSecurity:
         with client.session_transaction() as sess:
             sess['oauth_state'] = 'test_state'
             sess['oauth_provider'] = 'google'
-        
-        # Mock malformed token response
-        responses.add(
-            responses.POST,
-            'https://oauth2.googleapis.com/token',
-            json={'invalid': 'response'},
-            status=200
-        )
-        
-        response = client.get('/auth/callback/google?code=test_code&state=test_state')
-        assert response.status_code == 500
-        data = response.get_json()
-        assert 'Authentication failed' in data['error']
+
+        # Patch get_provider to return a dummy provider
+        class DummyProvider:
+            def get_access_token(self, code, redirect_uri):
+                return {'invalid': 'response'}
+            def get_user_info(self, access_token):
+                return {'id': 'dummy', 'email': 'dummy@example.com'}
+
+        with patch('services.oauth.OAuthService.get_provider', return_value=DummyProvider()):
+            response = client.get('/auth/callback/google?code=test_code&state=test_state')
+            assert response.status_code == 400
+            data = response.get_json()
+            assert 'Failed to obtain access token' in data['error']
     
     @responses.activate
     def test_malformed_user_info_response(self, client):

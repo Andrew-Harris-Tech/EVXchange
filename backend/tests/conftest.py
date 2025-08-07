@@ -55,4 +55,5 @@ def sample_user(app):
         )
         db.session.add(user)
         db.session.commit()
+        db.session.refresh(user)  # Ensure user is attached to session
         return user
