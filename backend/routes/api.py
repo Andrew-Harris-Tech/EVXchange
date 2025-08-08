@@ -1,4 +1,3 @@
-
 import os
 import stripe
 from flask import Blueprint, jsonify, request, g
@@ -207,3 +206,64 @@ def stripe_webhook():
         # Here you would update booking/payment status
         return jsonify({"status": "success"})
     return jsonify({"status": "ignored"})
+
+# --- Ratings and Reviews (In-memory mock) ---
+reviews_db = []
+review_id_counter = [1]
+
+@api_bp.route('/bookings/<int:booking_id>/review', methods=['POST'])
+@login_required
+def add_review(booking_id):
+    data = request.get_json() or {}
+    if "rating" not in data or "review" not in data:
+        return jsonify({"error": "Missing rating or review"}), 400
+    # For test: allow any booking_id, but only one review per booking/user
+    existing = next((r for r in reviews_db if r["booking_id"] == booking_id and r["user_id"] == current_user.id), None)
+    if existing:
+        return jsonify({"error": "Review already exists"}), 409
+    rid = review_id_counter[0]
+    review_id_counter[0] += 1
+    review = {
+        "review_id": rid,
+        "booking_id": booking_id,
+        "station_id": 1,  # For mock, always station 1
+        "user_id": current_user.id,
+        "rating": data["rating"],
+        "review": data["review"]
+    }
+    reviews_db.append(review)
+    return jsonify(review), 201
+
+@api_bp.route('/stations/<int:station_id>/reviews', methods=['GET'])
+def get_reviews_for_station(station_id):
+    station_reviews = [r for r in reviews_db if r["station_id"] == station_id]
+    return jsonify({"reviews": station_reviews})
+
+@api_bp.route('/reviews/<int:review_id>', methods=['PUT'])
+@login_required
+def update_review(review_id):
+    review = next((r for r in reviews_db if r["review_id"] == review_id and r["user_id"] == current_user.id), None)
+    if not review:
+        return jsonify({"error": "Review not found"}), 404
+    data = request.get_json() or {}
+    if "rating" in data:
+        review["rating"] = data["rating"]
+    if "review" in data:
+        review["review"] = data["review"]
+    return jsonify(review)
+
+@api_bp.route('/reviews/<int:review_id>', methods=['DELETE'])
+@login_required
+def delete_review(review_id):
+    idx = next((i for i, r in enumerate(reviews_db) if r["review_id"] == review_id and r["user_id"] == current_user.id), None)
+    if idx is None:
+        return jsonify({"error": "Review not found"}), 404
+    reviews_db.pop(idx)
+    return '', 204
+
+@api_bp.route('/reviews/<int:review_id>', methods=['GET'])
+def get_review(review_id):
+    review = next((r for r in reviews_db if r["review_id"] == review_id), None)
+    if not review:
+        return jsonify({"error": "Review not found"}), 404
+    return jsonify(review)
