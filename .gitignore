@@ -1,3 +1,13 @@
+# Node/React (frontend)
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.*
+frontend/.DS_Store
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.eslintcache
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
