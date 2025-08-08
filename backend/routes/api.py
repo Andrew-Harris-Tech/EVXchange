@@ -1,11 +1,65 @@
+
 import os
 import stripe
-
-
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from flask_login import login_required, current_user
 
 api_bp = Blueprint('api', __name__)
+
+# In-memory mock for stations (per host)
+stations_db = []
+station_id_counter = [1]
+
+# --- Host Station Management Endpoints ---
+@api_bp.route('/host/stations', methods=['POST'])
+@login_required
+def create_station():
+    data = request.get_json() or {}
+    required = ["name", "lat", "lng", "address"]
+    if not all(k in data for k in required):
+        return jsonify({"error": "Missing station data"}), 400
+    sid = station_id_counter[0]
+    station_id_counter[0] += 1
+    station = {
+        "station_id": sid,
+        "host_id": current_user.id if hasattr(current_user, 'id') else 1,
+        "name": data["name"],
+        "lat": data["lat"],
+        "lng": data["lng"],
+        "address": data["address"]
+    }
+    stations_db.append(station)
+    return jsonify(station), 201
+
+@api_bp.route('/host/stations', methods=['GET'])
+@login_required
+def list_host_stations():
+    host_id = current_user.id if hasattr(current_user, 'id') else 1
+    host_stations = [s for s in stations_db if s["host_id"] == host_id]
+    return jsonify({"stations": host_stations})
+
+@api_bp.route('/host/stations/<int:station_id>', methods=['PUT'])
+@login_required
+def update_station(station_id):
+    host_id = current_user.id if hasattr(current_user, 'id') else 1
+    station = next((s for s in stations_db if s["station_id"] == station_id and s["host_id"] == host_id), None)
+    if not station:
+        return jsonify({"error": "Station not found"}), 404
+    data = request.get_json() or {}
+    for k in ["name", "lat", "lng", "address"]:
+        if k in data:
+            station[k] = data[k]
+    return jsonify(station)
+
+@api_bp.route('/host/stations/<int:station_id>', methods=['DELETE'])
+@login_required
+def delete_station(station_id):
+    host_id = current_user.id if hasattr(current_user, 'id') else 1
+    idx = next((i for i, s in enumerate(stations_db) if s["station_id"] == station_id and s["host_id"] == host_id), None)
+    if idx is None:
+        return jsonify({"error": "Station not found"}), 404
+    stations_db.pop(idx)
+    return '', 204
 
 from datetime import datetime, timezone
 bookings_db = []  # In-memory mock for bookings
