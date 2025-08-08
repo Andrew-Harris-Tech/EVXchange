@@ -1,4 +1,3 @@
-
 import os
 import stripe
 from flask import Blueprint, jsonify, request, g
@@ -298,3 +297,10 @@ def get_review(review_id):
     if not review:
         return jsonify({"error": "Review not found"}), 404
     return jsonify(review)
+
+# --- Geolocation Endpoint (Mock) ---
+@api_bp.route('/geolocation')
+@login_required
+def get_user_geolocation():
+    # In a real app, use IP or device info; here, return a fixed mock location
+    return jsonify({"lat": 37.7749, "lng": -122.4194})
