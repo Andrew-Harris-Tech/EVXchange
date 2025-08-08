@@ -1,9 +1,40 @@
+
 import os
 import stripe
 from flask import Blueprint, jsonify, request, g
 from flask_login import login_required, current_user
 
 api_bp = Blueprint('api', __name__)
+
+# --- User Dashboard Endpoint (Mock) ---
+@api_bp.route('/dashboard')
+@login_required
+def user_dashboard():
+    user_id = current_user.id
+    # Mock bookings for this user
+    user_bookings = [
+        b for b in bookings_db if b["user_id"] == user_id
+    ]
+    # Mock payments for this user (simulate one per booking)
+    user_payments = [
+        {
+            "payment_id": b["booking_id"],
+            "booking_id": b["booking_id"],
+            "amount": 1000,
+            "currency": "usd",
+            "status": "paid"
+        }
+        for b in user_bookings
+    ]
+    # Mock reviews for this user
+    user_reviews = [
+        r for r in reviews_db if r["user_id"] == user_id
+    ]
+    return jsonify({
+        "bookings": user_bookings,
+        "payments": user_payments,
+        "reviews": user_reviews
+    })
 
 # In-memory mock for stations (per host)
 stations_db = []
