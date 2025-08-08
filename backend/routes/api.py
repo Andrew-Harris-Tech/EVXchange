@@ -1,7 +1,65 @@
+
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 
 api_bp = Blueprint('api', __name__)
+
+from datetime import datetime, timezone
+bookings_db = []  # In-memory mock for bookings
+
+# --- Booking Endpoints ---
+@api_bp.route('/bookings/', methods=['POST'])
+def create_booking():
+    data = request.get_json() or {}
+    required = ["station_id", "user_id", "start_time", "end_time"]
+    if not all(k in data for k in required):
+        return jsonify({"error": "Missing booking data"}), 400
+    try:
+        start = datetime.fromisoformat(data["start_time"].replace("Z", "+00:00"))
+        end = datetime.fromisoformat(data["end_time"].replace("Z", "+00:00"))
+    except Exception:
+        return jsonify({"error": "Invalid date format"}), 400
+    # Check for overlap
+    for b in bookings_db:
+        if b["station_id"] == data["station_id"] and not (end <= b["start_time"] or start >= b["end_time"]):
+            return jsonify({"error": "Booking time overlaps with existing booking"}), 409
+    booking_id = len(bookings_db) + 1
+    booking = {
+        "booking_id": booking_id,
+        "station_id": data["station_id"],
+        "user_id": data["user_id"],
+        "start_time": start,
+        "end_time": end,
+        "status": "confirmed"
+    }
+    bookings_db.append(booking)
+    return jsonify({"booking_id": booking_id, "status": "confirmed"}), 201
+
+@api_bp.route('/stations/<int:station_id>/availability')
+def station_availability(station_id):
+    date_str = request.args.get("date")
+    if not date_str:
+        return jsonify({"error": "Missing date parameter"}), 400
+    try:
+        date = datetime.fromisoformat(date_str)
+    except Exception:
+        return jsonify({"error": "Invalid date format"}), 400
+    # Mock: 8am-8pm, 1hr slots, remove slots with bookings
+    slots = [
+        (date.replace(hour=h, minute=0, second=0, microsecond=0, tzinfo=timezone.utc),
+         date.replace(hour=h+1, minute=0, second=0, microsecond=0, tzinfo=timezone.utc))
+        for h in range(8, 20)
+    ]
+    available = []
+    for start, end in slots:
+        overlap = False
+        for b in bookings_db:
+            if b["station_id"] == station_id and not (end <= b["start_time"] or start >= b["end_time"]):
+                overlap = True
+                break
+        if not overlap:
+            available.append({"start": start.isoformat(), "end": end.isoformat()})
+    return jsonify({"available_slots": available})
 
 @api_bp.route('/health')
 def health_check():
