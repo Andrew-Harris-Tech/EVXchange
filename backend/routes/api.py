@@ -1,3 +1,6 @@
+import os
+import stripe
+
 
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
@@ -105,3 +108,48 @@ def nearby_stations():
         }
     ]
     return jsonify({"stations": stations})
+
+# --- Stripe Payment Endpoints ---
+@api_bp.route('/payments/checkout', methods=['POST'])
+def create_checkout_session():
+    data = request.get_json() or {}
+    required = ["booking_id", "amount", "currency", "success_url", "cancel_url"]
+    if not all(k in data for k in required):
+        return jsonify({"error": "Missing or invalid data"}), 400
+    # In real use, set your Stripe secret key from env
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_dummy")
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": data["currency"],
+                    "product_data": {"name": f"Booking {data['booking_id']}"},
+                    "unit_amount": data["amount"]
+                },
+                "quantity": 1
+            }],
+            mode="payment",
+            success_url=data["success_url"],
+            cancel_url=data["cancel_url"]
+        )
+        return jsonify({"checkout_url": session.url})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api_bp.route('/payments/webhook', methods=['POST'])
+def stripe_webhook():
+    payload = request.data
+    sig_header = request.headers.get('Stripe-Signature', '')
+    endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_dummy")
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    # Handle event type
+    if event["type"] == "checkout.session.completed":
+        # Here you would update booking/payment status
+        return jsonify({"status": "success"})
+    return jsonify({"status": "ignored"})
