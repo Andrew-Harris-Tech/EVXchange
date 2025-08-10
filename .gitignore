@@ -8,6 +8,7 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/.eslintcache
+node_modules
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
