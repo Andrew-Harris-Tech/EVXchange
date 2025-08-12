@@ -1,6 +1,6 @@
-# ⚡ ChargeBnB
+# ⚡ EVXchange
 
-ChargeBnB is a peer-to-peer electric vehicle (EV) charging station platform — think AirBnB, but for home and public parking lot chargers. EV owners can search, view, and book nearby charging spots hosted by individuals or businesses. Hosts can monetize their unused chargers. The platform features secure authentication, real-time location mapping, seamless booking, payments, and reviews.
+EVXchange is a peer-to-peer electric vehicle (EV) charging station platform — think AirBnB, but for home and public parking lot chargers. EV owners can search, view, and book nearby charging spots hosted by individuals or businesses. Hosts can monetize their unused chargers. The platform features secure authentication, real-time location mapping, seamless booking, payments, and reviews.
 
 ---
 
@@ -82,8 +82,8 @@ After a booking, renters can:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/chargebnb.git
-cd chargebnb
+git clone https://github.com/yourusername/EVXchange.git
+cd EVXchange
 ```
 
 ### 2. Backend Setup (Flask)
@@ -136,7 +136,7 @@ REACT_APP_BACKEND_URL=http://localhost:5000
 ## 🛠️ Folder Structure
 
 ```
-chargebnb/
+EVXchange/
 ├── backend/        # Flask API + DB models
 ├── frontend/       # React SPA
 └── README.md
@@ -180,4 +180,4 @@ MIT License
 
 ## 🙋‍♀️ Authors
 
-Built with love by the ChargeBnB team.
+Built with love by the EVXchange team.
