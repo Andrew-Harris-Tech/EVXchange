@@ -1,16 +1,20 @@
 import os
 from flask import Flask
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 # Initialize extensions
+
 db = SQLAlchemy()
 login_manager = LoginManager()
+migrate = Migrate()
 
 def create_app(config_name='development'):
     """Application factory pattern"""
@@ -30,8 +34,10 @@ def create_app(config_name='development'):
     app.config['LINKEDIN_CLIENT_SECRET'] = os.getenv('LINKEDIN_CLIENT_SECRET')
     
     # Initialize extensions with app
+
     db.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)
     CORS(app)
     
     # Configure Flask-Login
@@ -58,5 +64,10 @@ def create_app(config_name='development'):
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(api_bp, url_prefix='/api')
-    
+
+    # Health check route
+    @app.route("/")
+    def index():
+        return "ChargeBnB backend is running!", 200
+
     return app
