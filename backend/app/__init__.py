@@ -64,5 +64,10 @@ def create_app(config_name='development'):
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(api_bp, url_prefix='/api')
-    
+
+    # Health check route
+    @app.route("/")
+    def index():
+        return "ChargeBnB backend is running!", 200
+
     return app
