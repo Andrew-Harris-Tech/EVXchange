@@ -18,7 +18,9 @@ migrate = Migrate()
 
 def create_app(config_name='development'):
     """Application factory pattern"""
-    app = Flask(__name__)
+    # Serve React build as static in production
+    react_build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../frontend/build'))
+    app = Flask(__name__, static_folder=react_build_dir, static_url_path='/')
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
@@ -65,9 +67,18 @@ def create_app(config_name='development'):
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(api_bp, url_prefix='/api')
 
-    # Health check route
-    @app.route("/")
-    def index():
-        return "ChargeBnB backend is running!", 200
+
+    # Serve React index.html for all non-API routes
+    from flask import send_from_directory
+
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_react(path):
+        if path.startswith('api') or path.startswith('auth'):
+            return "Not Found", 404
+        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
 
     return app
