@@ -80,9 +80,14 @@ def create_app(config_name='development'):
     def serve_react(path):
         if path.startswith('api') or path.startswith('auth'):
             return "Not Found", 404
-        if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-            return send_from_directory(app.static_folder, path)
-        else:
-            return send_from_directory(app.static_folder, 'index.html')
+        if path != "":
+            # Normalize the user-supplied path and ensure it's within static folder
+            abs_static_folder = os.path.abspath(app.static_folder)
+            normalized_path = os.path.normpath(os.path.join(abs_static_folder, path))
+            if normalized_path.startswith(abs_static_folder) and os.path.exists(normalized_path):
+                # Serve only if the normalized path is inside the static folder
+                rel_path = os.path.relpath(normalized_path, abs_static_folder)
+                return send_from_directory(abs_static_folder, rel_path)
+        return send_from_directory(app.static_folder, 'index.html')
 
     return app
