@@ -2,9 +2,11 @@ import os
 import stripe
 from flask import Blueprint, jsonify, request, g
 from flask_login import login_required, current_user
-
+import logging
 api_bp = Blueprint('api', __name__)
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 # --- User Dashboard Endpoint (Mock) ---
 @api_bp.route('/dashboard')
 @login_required
@@ -230,7 +232,8 @@ def stripe_webhook():
             payload, sig_header, endpoint_secret
         )
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        logger.exception("Error while processing Stripe webhook event.")
+        return jsonify({"error": "Invalid payload or signature"}), 400
     # Handle event type
     if event["type"] == "checkout.session.completed":
         # Here you would update booking/payment status
