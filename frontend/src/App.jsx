@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Navbar from './components/layout/Navbar';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -18,16 +19,8 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <nav style={{ padding: '1rem', background: '#f5f5f5' }}>
-          <Link to="/">Home</Link> |{' '}
-          <Link to="/map">Map</Link> |{' '}
-          <Link to="/booking">Booking</Link> |{' '}
-          <Link to="/payments">Payments</Link> |{' '}
-          <Link to="/reviews">Reviews</Link> |{' '}
-          <Link to="/dashboard">Dashboard</Link> |{' '}
-          <Link to="/host">Host</Link> |{' '}
-          <Link to="/geolocation">Geolocation</Link>
-        </nav>
+        <Navbar />
+        <div className="container mt-4">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -40,6 +33,7 @@ function App() {
           <Route path="/geolocation" element={<Geolocation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
       </Router>
     </AuthProvider>
   );
