@@ -55,6 +55,6 @@ else
   npm start &
   FRONTEND_PID=$!
   cd ..
-  # Wait for both to exit
+  trap 'kill $BACKEND_PID $FRONTEND_PID' SIGINT SIGTERM
   wait $BACKEND_PID $FRONTEND_PID
 fi
