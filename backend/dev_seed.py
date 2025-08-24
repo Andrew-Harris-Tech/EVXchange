@@ -1,9 +1,9 @@
 # dev_seed.py: Populate the dev database with sample users, cars, and stations
-from app import db
+from backend.app import db
 from models import User, Car, Station
 
 def seed_dev_data():
-    from app import create_app
+    from backend.app import create_app
     app = create_app('development')
     with app.app_context():
         db.drop_all()

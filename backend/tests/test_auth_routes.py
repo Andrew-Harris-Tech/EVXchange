@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 from flask import url_for, session
 from flask_login import current_user
 from models.user import User
-from app import db
+from backend.app import db
 
 class TestAuthRoutes:
     """Test cases for authentication routes"""

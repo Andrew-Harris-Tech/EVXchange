@@ -3,7 +3,7 @@ import responses
 from unittest.mock import patch, MagicMock
 from models.user import User
 from services.oauth import OAuthService
-from app import db
+from backend.app import db
 
 class TestOAuthSecurity:
     """Test cases for OAuth security and edge cases"""

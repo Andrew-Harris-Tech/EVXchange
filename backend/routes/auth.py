@@ -4,7 +4,7 @@ from flask import Blueprint, request, redirect, url_for, session, jsonify, curre
 from flask_login import login_user, logout_user, login_required, current_user
 from models.user import User
 from services.oauth import OAuthService
-from app import db
+from backend.app import db
 
 
 auth_bp = Blueprint('auth', __name__)

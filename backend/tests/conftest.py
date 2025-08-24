@@ -1,7 +1,7 @@
 import os
 import tempfile
 import pytest
-from app import create_app, db
+from backend.app import create_app, db
 from models.user import User
 
 @pytest.fixture
