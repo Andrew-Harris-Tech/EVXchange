@@ -2,6 +2,7 @@ import pytest
 import responses
 from unittest.mock import patch, MagicMock
 from flask import url_for, session
+from urllib.parse import urlparse
 from flask_login import current_user
 from models.user import User
 from backend.app import db
@@ -15,7 +16,7 @@ class TestAuthRoutes:
             response = client.get('/auth/login/google')
             
             assert response.status_code == 302
-            assert 'accounts.google.com' in response.location
+            assert urlparse(response.location).hostname == "accounts.google.com"
             assert 'client_id=test-google-client-id' in response.location
     
     def test_oauth_login_facebook(self, client, app):
