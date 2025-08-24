@@ -1,15 +1,17 @@
 // ...App entry point...
+
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
-import BookingForm from './components/booking/BookingForm';
-import BookingSummary from './components/booking/BookingSummary';
-import BookingHistory from './components/booking/BookingHistory';
-import PaymentForm from './components/payment/PaymentForm';
-import StationCard from './components/station/StationCard';
-import ReviewList from './components/station/ReviewList';
-import HostDashboard from './components/host/HostDashboard';
 import Footer from './components/layout/Footer';
+// Pages
+import Home from './pages/Home.jsx';
+import Map from './pages/Map.jsx';
+import Booking from './pages/Booking.jsx';
+import HostStations from './pages/HostStations.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import NotFound from './pages/NotFound.jsx';
 
 
 function App() {
@@ -22,29 +24,14 @@ function App() {
             <Sidebar />
           </div>
           <div className="col-md-8 mb-3">
-            <div className="row g-3">
-              <div className="col-12">
-                <BookingForm />
-              </div>
-              <div className="col-md-6">
-                <BookingSummary />
-              </div>
-              <div className="col-md-6">
-                <BookingHistory />
-              </div>
-              <div className="col-md-6">
-                <PaymentForm />
-              </div>
-              <div className="col-md-6">
-                <StationCard />
-              </div>
-              <div className="col-12">
-                <ReviewList />
-              </div>
-              <div className="col-12">
-                <HostDashboard />
-              </div>
-            </div>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/map" element={<Map />} />
+              <Route path="/booking" element={<Booking />} />
+              <Route path="/host" element={<HostStations />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </div>
         </div>
       </div>
