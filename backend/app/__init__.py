@@ -65,8 +65,8 @@ def create_app(config_name='development'):
         return redirect(url_for(login_manager.login_view))
     
     # Register blueprints
-    from backend.routes.auth import auth_bp
-    from backend.routes.api import api_bp
+    from routes.auth import auth_bp
+    from routes.api import api_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(api_bp, url_prefix='/api')
