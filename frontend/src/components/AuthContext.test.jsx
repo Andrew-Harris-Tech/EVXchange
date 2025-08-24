@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { AuthProvider, RequireAuth, useAuth } from './AuthContext';
 
 function DummyProtected() {
@@ -18,12 +18,13 @@ describe('RequireAuth', () => {
     expect(screen.getByText(/must be logged in/i)).toBeInTheDocument();
   });
 
-  it('renders children if authenticated', () => {
+  it('renders children if authenticated', async () => {
     function Wrapper() {
       const { login } = useAuth();
       React.useEffect(() => {
         login({ name: 'Test User' });
-      }, [login]);
+        // eslint-disable-next-line
+      }, []);
       return (
         <RequireAuth>
           <DummyProtected />
@@ -35,6 +36,8 @@ describe('RequireAuth', () => {
         <Wrapper />
       </AuthProvider>
     );
-    expect(screen.getByText(/protected content/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText(/protected content/i)).toBeInTheDocument()
+    );
   });
 });
