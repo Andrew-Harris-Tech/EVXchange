@@ -1,13 +1,23 @@
 import logging
 from logging.config import fileConfig
 
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from app import create_app
 from flask import current_app
 
 from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
+
 config = context.config
+
+# Create the Flask app and push an app context
+app = create_app()
+app.app_context().push()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

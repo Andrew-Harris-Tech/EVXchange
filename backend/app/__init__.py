@@ -24,7 +24,11 @@ def create_app(config_name='development'):
     
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///chargebnb.db')
+    # Force SQLite for tests
+    if 'test' in config_name.lower():
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///chargebnb.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # OAuth Configuration
