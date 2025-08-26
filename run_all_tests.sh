@@ -12,8 +12,10 @@ else
   echo "Backend test script not found."
 fi
 
-# Run frontend tests
+# Run frontend build and tests
 if [ -f frontend/package.json ]; then
+  echo "\n🔨 Building frontend..."
+  (cd frontend && npm install && npm run build)
   echo "\n🧪 Running frontend tests..."
   (cd frontend && npm test -- --watchAll=false)
 else
