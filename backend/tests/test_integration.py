@@ -137,7 +137,7 @@ class TestOAuthIntegration:
         
         data = response.get_json()
         assert data['status'] == 'healthy'
-        assert 'evxchange API' in data['message']
+        assert 'ChargeBnB API' in data['message']
     
     def test_api_profile_requires_auth(self, client):
         """Test that API profile endpoint requires authentication"""
