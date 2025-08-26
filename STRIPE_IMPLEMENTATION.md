@@ -3,7 +3,7 @@
 **[Back to Project Wiki](PROJECT_WIKI.md)** | [Booking](BOOKING_IMPLEMENTATION.md) | [Reviews](REVIEWS_IMPLEMENTATION.md) | [OAuth](OAUTH_IMPLEMENTATION.md)
 
 ## Overview
-This document explains how Stripe payments are integrated into ChargeBnB, including backend setup, environment variables, and test/development tips.
+This document explains how Stripe payments are integrated into evxchange, including backend setup, environment variables, and test/development tips.
 
 ## Environment Variables
 - `STRIPE_SECRET_KEY`: Your Stripe secret API key

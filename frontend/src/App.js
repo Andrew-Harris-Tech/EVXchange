@@ -6,15 +6,20 @@ import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Footer from './components/layout/Footer';
 // Pages
+
 import Home from './pages/Home.jsx';
 import Map from './pages/Map.jsx';
 import Booking from './pages/Booking.jsx';
 import HostStations from './pages/HostStations.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Landing from './pages/Landing.jsx';
+import Profile from './pages/Profile.jsx';
+import { useAuth } from './components/AuthContext';
 
 
 function App() {
+  const { user } = useAuth();
   return (
     <div className="d-flex flex-column min-vh-100">
       <Navbar />
@@ -25,7 +30,9 @@ function App() {
           </div>
           <div className="col-md-8 mb-3">
             <Routes>
-              <Route path="/" element={<Home />} />
+              {/* Landing page for unauthenticated users, Home for logged in */}
+              <Route path="/" element={user ? <Home /> : <Landing />} />
+              <Route path="/profile" element={user ? <Profile /> : <Landing />} />
               <Route path="/map" element={<Map />} />
               <Route path="/booking" element={<Booking />} />
               <Route path="/host" element={<HostStations />} />

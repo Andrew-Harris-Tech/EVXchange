@@ -1,4 +1,4 @@
-# ChargeBnB Models Module
+# evxchange Models Module
 # Contains database models for the application
 
 from .user import User

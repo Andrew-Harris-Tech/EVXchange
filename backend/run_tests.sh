@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# ChargeBnB Backend Test Script
+# evxchange Backend Test Script
 # This script runs all unit and integration tests for OAuth authentication
 
-echo "🧪 ChargeBnB OAuth Authentication Test Suite"
+echo "🧪 evxchange OAuth Authentication Test Suite"
 echo "=============================================="
 
 # Colors for output
@@ -39,6 +39,7 @@ fi
 echo "📦 Installing/updating dependencies..."
 pip install -r requirements.txt
 
+export PYTHONPATH="$(cd .. && pwd)"
 # Inject dummy OAuth credentials for testing (matching app config names and test expectations)
 export GOOGLE_CLIENT_ID="test-google-client-id"
 export GOOGLE_CLIENT_SECRET="dummy-google-client-secret"

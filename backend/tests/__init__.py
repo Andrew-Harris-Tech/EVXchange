@@ -1,2 +1,2 @@
-# ChargeBnB Tests Module
+# evxchange Tests Module
 # Contains test cases for OAuth authentication system

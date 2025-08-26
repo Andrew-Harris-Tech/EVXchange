@@ -3,7 +3,7 @@
 **[Back to Project Wiki](PROJECT_WIKI.md)** | [Reviews](REVIEWS_IMPLEMENTATION.md) | [OAuth](OAUTH_IMPLEMENTATION.md) | [Stripe](STRIPE_IMPLEMENTATION.md)
 
 ## Overview
-This document describes the booking and availability logic for ChargeBnB, including API endpoints, data flow, and test coverage.
+This document describes the booking and availability logic for evxchange, including API endpoints, data flow, and test coverage.
 
 ## Backend Endpoints
 - `POST /api/bookings/` — Create a new booking
