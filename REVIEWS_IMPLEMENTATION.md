@@ -3,7 +3,7 @@
 **[Back to Project Wiki](PROJECT_WIKI.md)** | [Booking](BOOKING_IMPLEMENTATION.md) | [OAuth](OAUTH_IMPLEMENTATION.md) | [Stripe](STRIPE_IMPLEMENTATION.md)
 
 ## Overview
-This document covers the ratings and review system for completed bookings in ChargeBnB.
+This document covers the ratings and review system for completed bookings in evxchange.
 
 ## Backend Endpoints
 - `POST /api/bookings/<booking_id>/review` — Add a review for a completed booking

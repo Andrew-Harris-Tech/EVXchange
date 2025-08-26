@@ -1,10 +1,10 @@
-# ChargeBnB Backend Makefile
+# evxchange Backend Makefile
 # Convenient commands for development and testing
 
 .PHONY: help install test test-unit test-integration test-coverage test-security lint format clean
 
 help:
-	@echo "ChargeBnB OAuth Authentication Development Commands"
+	@echo "evxchange OAuth Authentication Development Commands"
 	@echo "=================================================="
 	@echo ""
 	@echo "Setup Commands:"
@@ -98,10 +98,10 @@ clean:
 
 # Docker commands (for future use)
 docker-build:
-	docker build -t chargebnb-backend .
+	docker build -t evxchange-backend .
 
 docker-run:
-	docker run -p 5000:5000 chargebnb-backend
+	docker run -p 5000:5000 evxchange-backend
 
 # CI/CD simulation
 ci-test: lint test-coverage test-security

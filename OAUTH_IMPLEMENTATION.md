@@ -2,7 +2,7 @@
 
 **[Back to Project Wiki](PROJECT_WIKI.md)** | [Booking](BOOKING_IMPLEMENTATION.md) | [Reviews](REVIEWS_IMPLEMENTATION.md) | [Stripe](STRIPE_IMPLEMENTATION.md)
 
-This document summarizes the comprehensive OAuth authentication system implemented for ChargeBnB, supporting Google, Facebook, and LinkedIn login with extensive unit testing.
+This document summarizes the comprehensive OAuth authentication system implemented for evxchange, supporting Google, Facebook, and LinkedIn login with extensive unit testing.
 
 ## 📁 Files Created
 
@@ -255,4 +255,4 @@ make run
 5. **Mobile SDKs** - React Native OAuth integration
 6. **SSO Integration** - Enterprise SSO support
 
-This implementation provides a solid foundation for ChargeBnB's authentication system with comprehensive testing ensuring reliability and security.
+This implementation provides a solid foundation for evxchange's authentication system with comprehensive testing ensuring reliability and security.

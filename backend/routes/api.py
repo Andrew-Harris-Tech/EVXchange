@@ -152,7 +152,7 @@ def station_availability(station_id):
 @api_bp.route('/health')
 def health_check():
     """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'message': 'ChargeBnB API is running'})
+    return jsonify({'status': 'healthy', 'message': 'evxchange API is running'})
 
 @api_bp.route('/profile')
 @login_required
@@ -179,14 +179,14 @@ def nearby_stations():
     stations = [
         {
             "id": 1,
-            "name": "ChargeBnB Station Downtown",
+            "name": "evxchange Station Downtown",
             "lat": lat + 0.001,
             "lng": lng + 0.001,
             "address": "123 Main St, Cityville"
         },
         {
             "id": 2,
-            "name": "ChargeBnB Station Uptown",
+            "name": "evxchange Station Uptown",
             "lat": lat - 0.001,
             "lng": lng - 0.001,
             "address": "456 Oak Ave, Cityville"

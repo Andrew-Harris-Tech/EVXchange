@@ -1,4 +1,4 @@
-# ChargeBnB Routes Module
+# evxchange Routes Module
 # Contains Flask route definitions and request handlers
 
 from .auth import auth_bp

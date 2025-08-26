@@ -9,7 +9,7 @@
 
 - `DATABASE_URL`:  
   The database connection string.  
-  - For local SQLite: `sqlite:///chargebnb.db`  
+  - For local SQLite: `sqlite:///evxchange.db`  
   - For Heroku Postgres:  
     Get from your Heroku app dashboard under Settings > Config Vars.  
     [Heroku Postgres Docs](https://devcenter.heroku.com/articles/heroku-postgresql#connecting-in-python)

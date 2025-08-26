@@ -26,6 +26,7 @@ pip install -r backend/requirements.txt 2>&1 | tee backend_pip_install.log
 # 3. Run Alembic migrations
 if [ -d "backend/migrations" ]; then
   cd backend
+  export PYTHONPATH="$(cd .. && pwd)"
   ALEMBIC_CONFIG="alembic.ini"
   if [ ! -f "$ALEMBIC_CONFIG" ] && [ -f "migrations/alembic.ini" ]; then
     ALEMBIC_CONFIG="migrations/alembic.ini"
@@ -42,11 +43,13 @@ fi
 if [ "$MODE" = "prod" ]; then
   # Production: serve built React from Flask only
   cd backend
+  export PYTHONPATH="$(cd .. && pwd)"
   export FLASK_APP=run.py
   flask run 2>&1 | tee ../backend.log
 else
   # Development: start Flask and React dev server in parallel
   cd backend
+  export PYTHONPATH="$(cd .. && pwd)"
   export FLASK_APP=run.py
   export FLASK_ENV=development
   flask run 2>&1 | tee ../backend.log &

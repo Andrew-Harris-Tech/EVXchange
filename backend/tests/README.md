@@ -1,6 +1,6 @@
-# ChargeBnB OAuth Authentication Tests
+# evxchange OAuth Authentication Tests
 
-This directory contains comprehensive unit and integration tests for the ChargeBnB OAuth authentication system supporting Google, Facebook, and LinkedIn login.
+This directory contains comprehensive unit and integration tests for the evxchange OAuth authentication system supporting Google, Facebook, and LinkedIn login.
 
 ## 🧪 Test Structure
 

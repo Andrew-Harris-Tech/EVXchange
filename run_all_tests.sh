@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run all backend and frontend tests for ChargeBnB
+# Run all backend and frontend tests for evxchange
 
 set -e
 
