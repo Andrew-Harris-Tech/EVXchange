@@ -1,12 +1,12 @@
 import React from 'react';
+import MapView from '../components/discovery/MapView';
 
 export default function Map() {
   return (
     <div style={{ padding: 32 }}>
       <h2>Find Nearby Chargers</h2>
       <div style={{ height: 400, background: '#eee', margin: '16px 0' }}>
-        {/* Google Maps integration goes here */}
-        <p>Map placeholder</p>
+        <MapView />
       </div>
     </div>
   );
