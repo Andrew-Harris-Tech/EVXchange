@@ -220,7 +220,8 @@ def create_checkout_session():
         )
         return jsonify({"checkout_url": session.url})
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        logger.exception("Error creating Stripe checkout session.")
+        return jsonify({"error": "Failed to create checkout session."}), 400
 
 @api_bp.route('/payments/webhook', methods=['POST'])
 def stripe_webhook():
