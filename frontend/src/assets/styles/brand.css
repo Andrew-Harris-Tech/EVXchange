@@ -1,0 +1,134 @@
+
+@import './bootstrap-import.css';
+/* EVXchange Brand CSS */
+
+:root {
+  /* Brand Colors */
+  --color-caribbean-sky: #00B8D9;
+  --color-aero-blue: #D2FEE1;
+  --color-midnight-moon: #1A1A2E;
+  --color-lavender-light: #D4C4FD;
+  --color-banana-mania: #FFF0B5;
+
+  /* Typography */
+  --font-regular: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+}
+
+body {
+  font-family: var(--font-regular);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-midnight-moon);
+  background: var(--color-aero-blue);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-caribbean-sky);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-md);
+  letter-spacing: 0.01em;
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.1;
+}
+h2 {
+  font-size: 2rem;
+}
+h3 {
+  font-size: 1.5rem;
+}
+h4 {
+  font-size: 1.25rem;
+}
+h5 {
+  font-size: 1.1rem;
+}
+h6 {
+  font-size: 1rem;
+}
+
+p, li, span, label, input, button, a {
+  font-family: var(--font-regular);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-midnight-moon);
+}
+
+strong, b {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Buttons */
+.button, button, input[type="submit"] {
+  background: var(--color-caribbean-sky);
+  color: var(--color-banana-mania);
+  border: none;
+  border-radius: 6px;
+  padding: var(--space-sm) var(--space-md);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-regular);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.button:hover, button:hover, input[type="submit"]:hover {
+  background: var(--color-midnight-moon);
+  color: var(--color-banana-mania);
+}
+
+/* Card/Panel */
+.card {
+  background: var(--color-lavender-light);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(26,26,46,0.08);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+/* Utility classes for spacing */
+.mt-lg { margin-top: var(--space-lg); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.mt-md { margin-top: var(--space-md); }
+.mb-md { margin-bottom: var(--space-md); }
+
+/* Links */
+a {
+  color: var(--color-caribbean-sky);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--color-midnight-moon);
+}
+
+/* Highlighted text */
+.highlight {
+  background: var(--color-lavender-light);
+  color: var(--color-midnight-moon);
+  padding: 0 var(--space-xs);
+  border-radius: 4px;
+}
+
+/* Brand font sample */
+.brand-font-sample {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  font-size: 2rem;
+  color: var(--color-caribbean-sky);
+  letter-spacing: 0.05em;
+}
