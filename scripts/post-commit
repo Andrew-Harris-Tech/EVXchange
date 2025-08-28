@@ -1,0 +1,5 @@
+#!/bin/bash
+# This script builds the React frontend after every commit
+cd frontend
+npm install
+npm run build
