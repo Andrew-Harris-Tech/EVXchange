@@ -5,6 +5,7 @@ from flask import url_for, session
 from flask_login import current_user
 from models.user import User
 from backend.app import db
+from urllib.parse import urlparse
 
 class TestAuthRoutes:
     """Test cases for authentication routes"""
@@ -15,7 +16,7 @@ class TestAuthRoutes:
             response = client.get('/auth/login/google')
             
             assert response.status_code == 302
-            assert 'accounts.google.com' in response.location
+            assert urlparse(response.location).hostname == "accounts.google.com"
             assert 'client_id=test-google-client-id' in response.location
     
     def test_oauth_login_facebook(self, client, app):
@@ -24,7 +25,7 @@ class TestAuthRoutes:
             response = client.get('/auth/login/facebook')
             
             assert response.status_code == 302
-            assert 'facebook.com' in response.location
+            assert urlparse(response.location).hostname == "facebook.com"
             assert 'client_id=test-facebook-app-id' in response.location
     
     def test_oauth_login_linkedin(self, client, app):
@@ -33,7 +34,7 @@ class TestAuthRoutes:
             response = client.get('/auth/login/linkedin')
             
             assert response.status_code == 302
-            assert 'linkedin.com' in response.location
+            assert urlparse(response.location).hostname == "linkedin.com"
             assert 'client_id=test-linkedin-client-id' in response.location
     
     def test_oauth_login_invalid_provider(self, client):
