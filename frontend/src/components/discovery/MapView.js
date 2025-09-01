@@ -19,6 +19,7 @@ export default function MapView() {
 	const [searchResults, setSearchResults] = useState([]);
 	const [showResults, setShowResults] = useState(false);
 	const [locations, setLocations] = useState([]);
+	const [hasCentered, setHasCentered] = useState(false); // Track if we've centered on user
 	const searchTimeout = useRef();
 
 	// Fetch ChargeHub locations
@@ -29,16 +30,19 @@ export default function MapView() {
 			.catch(() => setLocations([]));
 	}, []);
 
-	// Get user location on mount
-	useEffect(() => {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-				pos => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-				undefined,
-				{ enableHighAccuracy: true }
-			);
-		}
-	}, []);
+		// Get user location on mount and center only once
+		useEffect(() => {
+			if (!hasCentered && navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(
+					pos => {
+						setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+						setHasCentered(true);
+					},
+					() => setHasCentered(true), // On error, don't keep trying
+					{ enableHighAccuracy: true }
+				);
+			}
+		}, [hasCentered]);
 
 	// Search for locations using Nominatim
 	useEffect(() => {
