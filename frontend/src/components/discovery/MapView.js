@@ -22,6 +22,15 @@ export default function MapView() {
 	const [hasCentered, setHasCentered] = useState(false); // Track if we've centered on user
 	const searchTimeout = useRef();
 
+	// Handler for recenter button
+	const recenterOnUser = () => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				pos => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+			);
+		}
+	};
+
 	// Fetch ChargeHub locations
 	useEffect(() => {
 		fetch('https://apiv3.chargehub.com/trial/locations')
@@ -67,16 +76,23 @@ export default function MapView() {
 		setSearchResults([]);
 	};
 
-	return (
-		<div style={{ height: '100%', width: '100%', position: 'relative' }}>
-			<div style={{ position: 'absolute', zIndex: 1000, top: 10, left: 10, right: 10 }}>
-				<input
-					type="text"
-					value={search}
-					onChange={e => { setSearch(e.target.value); setShowResults(true); }}
-					placeholder="Search for a location..."
-					style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
-				/>
+		return (
+			<div style={{ height: '100%', width: '100%', position: 'relative' }}>
+				<div style={{ position: 'absolute', zIndex: 1000, top: 10, left: 10, right: 10, display: 'flex', gap: 8 }}>
+						<input
+							type="text"
+							value={search}
+							onChange={e => { setSearch(e.target.value); setShowResults(true); }}
+							placeholder="Search for a location..."
+							style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
+						/>
+						<button
+							onClick={recenterOnUser}
+							style={{ padding: '8px 12px', borderRadius: 4, border: '1px solid #007bff', background: '#007bff', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
+							title="Recenter map on your location"
+						>
+							📍 My Location
+						</button>
 				{showResults && searchResults.length > 0 && (
 					<ul style={{ background: '#fff', listStyle: 'none', margin: 0, padding: 0, border: '1px solid #ccc', borderTop: 'none', maxHeight: 200, overflowY: 'auto' }}>
 						{searchResults.map(result => (
