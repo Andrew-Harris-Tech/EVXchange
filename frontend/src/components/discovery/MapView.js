@@ -22,18 +22,59 @@ export default function MapView() {
 	const [hasCentered, setHasCentered] = useState(false); // Track if we've centered on user
 	const searchTimeout = useRef();
 
-	// Handler for recenter button
-	const recenterOnUser = () => {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(
-				pos => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-			);
+
+		// Handler for recenter button
+		const recenterOnUser = () => {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(
+					pos => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+				);
+			}
+		};
+
+		// Haversine distance helper
+		function haversine(lat1, lon1, lat2, lon2) {
+			function toRad(x) { return x * Math.PI / 180; }
+			const R = 6371; // km
+			const dLat = toRad(lat2 - lat1);
+			const dLon = toRad(lon2 - lon1);
+			const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+				Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+				Math.sin(dLon/2) * Math.sin(dLon/2);
+			const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+			return R * c;
 		}
-	};
+
+		// Snap to nearest public charger
+		const snapToNearestCharger = () => {
+			if (!locations.length) return;
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(
+					pos => {
+						const userLat = pos.coords.latitude;
+						const userLng = pos.coords.longitude;
+						let minDist = Infinity;
+						let nearest = null;
+						for (const loc of locations) {
+							if (loc.Latitude && loc.Longitude) {
+								const dist = haversine(userLat, userLng, loc.Latitude, loc.Longitude);
+								if (dist < minDist) {
+									minDist = dist;
+									nearest = loc;
+								}
+							}
+						}
+						if (nearest) {
+							setCenter({ lat: nearest.Latitude, lng: nearest.Longitude });
+						}
+					}
+				);
+			}
+		};
 
 	// Fetch ChargeHub locations
 	useEffect(() => {
-		fetch('https://apiv3.chargehub.com/trial/locations')
+	fetch('/api/external/chargehub/locations')
 			.then(res => res.json())
 			.then(data => setLocations(Array.isArray(data) ? data : []))
 			.catch(() => setLocations([]));
@@ -86,13 +127,21 @@ export default function MapView() {
 							placeholder="Search for a location..."
 							style={{ flex: 1, padding: 8, borderRadius: 4, border: '1px solid #ccc' }}
 						/>
-						<button
-							onClick={recenterOnUser}
-							style={{ padding: '8px 12px', borderRadius: 4, border: '1px solid #007bff', background: '#007bff', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
-							title="Recenter map on your location"
-						>
-							📍 My Location
-						</button>
+								<button
+									onClick={recenterOnUser}
+									style={{ padding: '8px 12px', borderRadius: 4, border: '1px solid #007bff', background: '#007bff', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
+									title="Recenter map on your location"
+								>
+									📍 My Location
+								</button>
+								<button
+									onClick={snapToNearestCharger}
+									style={{ padding: '8px 12px', borderRadius: 4, border: '1px solid #28a745', background: '#28a745', color: '#fff', cursor: 'pointer', fontWeight: 600 }}
+									title="Snap to nearest public charger"
+									data-testid="snap-nearest-btn"
+								>
+									⚡ Nearest Charger
+								</button>
 				{showResults && searchResults.length > 0 && (
 					<ul style={{ background: '#fff', listStyle: 'none', margin: 0, padding: 0, border: '1px solid #ccc', borderTop: 'none', maxHeight: 200, overflowY: 'auto' }}>
 						{searchResults.map(result => (

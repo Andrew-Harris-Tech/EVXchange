@@ -1,3 +1,18 @@
+import requests
+# --- Proxy for ChargeHub API to avoid CORS ---
+@api_bp.route('/external/chargehub/locations', methods=['GET'])
+def proxy_chargehub_locations():
+    """
+    Proxies the ChargeHub trial API to avoid CORS issues on the frontend.
+    """
+    try:
+        resp = requests.get('https://apiv3.chargehub.com/trial/locations', timeout=10)
+        resp.raise_for_status()
+        # Pass through the JSON data
+        return jsonify(resp.json())
+    except Exception as e:
+        logger.exception("Failed to fetch ChargeHub locations")
+        return jsonify([]), 502
 import os
 import stripe
 from flask import Blueprint, jsonify, request, g
