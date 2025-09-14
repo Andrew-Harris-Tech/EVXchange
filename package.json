@@ -5,7 +5,11 @@
   "scripts": {
     "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
-  "devDependencies": {
-    "identity-obj-proxy": "^3.0.0"
+  "dependencies": {
+    "@craco/craco": "^7.1.0"
+  },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
   }
 }
