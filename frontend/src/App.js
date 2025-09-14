@@ -6,7 +6,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import NotFound from './pages/NotFound.jsx';
 // ...App entry point...
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
@@ -24,29 +24,35 @@ import SignUp from './pages/SignUp.jsx';
 
 function App() {
   const { user } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on route change
+  // Optionally, use useEffect with location if needed
+
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <Navbar />
-      <div className="container-fluid flex-grow-1 my-4">
-        <div className="row">
-          <div className="col-md-2 mb-3">
-            <Sidebar />
-          </div>
-          <div className="col-md-8 mb-3">
-            <Routes>
-              {/* Landing page for unauthenticated users, Home for logged in */}
-              <Route path="/" element={user ? <Home /> : <Landing />} />
-              <Route path="/profile" element={user ? <Profile /> : <Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/map" element={<Map />} />
-              <Route path="/booking" element={<Booking />} />
-              <Route path="/host" element={<HostStations />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar onHamburgerClick={() => setSidebarOpen(true)} />
+      {/* Sidebar overlay for mobile, inline for desktop */}
+      <div className="flex flex-1 pt-16">
+        {/* Sidebar: hidden on mobile unless open, always visible on md+ */}
+        <div className="md:block">
+          <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         </div>
+        {/* Main content */}
+        <main className="flex-1 px-2 md:px-8 py-4">
+          <Routes>
+            {/* Landing page for unauthenticated users, Home for logged in */}
+            <Route path="/" element={user ? <Home /> : <Landing />} />
+            <Route path="/profile" element={user ? <Profile /> : <Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/map" element={<Map />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/host" element={<HostStations />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
       </div>
       <Footer />
     </div>
