@@ -4,5 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "heroku-postbuild": "cd frontend && npm install && npm run build"
+  },
+  "devDependencies": {
+    "identity-obj-proxy": "^3.0.0"
   }
 }
