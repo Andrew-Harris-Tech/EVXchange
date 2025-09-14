@@ -1,23 +1,19 @@
 
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 
-export const navLinks = [
-	{ label: 'Home', to: '/' },
-	{ label: 'Stations', to: '/map' },
-	{ label: 'Bookings', to: '/booking' },
-	{ label: 'Host Dashboard', to: '/host' },
-	{ label: 'Profile', to: '/dashboard' },
-];
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import { NAV_LINKS } from './navLinks';
+
 
 export default function Navbar({ onHamburgerClick }) {
 	const location = useLocation();
-	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const { user, logout } = useAuth();
 
-	const handleHamburger = () => {
-		setMobileMenuOpen(!mobileMenuOpen);
-		if (onHamburgerClick) onHamburgerClick();
-	};
+	// Only show these entries in the Navbar
+	const navbarLinks = NAV_LINKS.filter(
+		l => l.showInNavbar && (!l.requiresAuth || user)
+	).filter(l => !(l.authAction === 'login' && user));
 
 	return (
 		<nav className="fixed top-0 left-0 w-full z-30 bg-primary text-white shadow">
@@ -27,7 +23,7 @@ export default function Navbar({ onHamburgerClick }) {
 					<button
 						className="focus:outline-none"
 						aria-label="Open sidebar menu"
-						onClick={handleHamburger}
+						onClick={onHamburgerClick}
 						data-testid="navbar-hamburger"
 					>
 						<svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -35,8 +31,8 @@ export default function Navbar({ onHamburgerClick }) {
 						</svg>
 					</button>
 				</div>
-				<ul className="hidden md:flex space-x-6">
-					{navLinks.map(link => (
+				<ul className="hidden md:flex space-x-6 items-center">
+					{navbarLinks.map(link => (
 						<li key={link.to}>
 							<Link
 								to={link.to}
@@ -47,7 +43,35 @@ export default function Navbar({ onHamburgerClick }) {
 							</Link>
 						</li>
 					))}
+					{/* Auth logic: show avatar or login/logout */}
+					{user ? (
+						<li>
+							<button
+								onClick={logout}
+								className="ml-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+								data-testid="navbar-logout"
+							>
+								Logout
+							</button>
+						</li>
+					) : (
+						<li>
+							<Link
+								to="/login"
+								className="ml-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+								data-testid="navbar-login"
+							>
+								Login
+							</Link>
+						</li>
+					)}
 				</ul>
+				{/* Avatar for logged in user (mobile) */}
+				{user && (
+					<div className="hidden md:block ml-4">
+						<img src={user.avatar || '/default-avatar.png'} alt="avatar" className="w-8 h-8 rounded-full" />
+					</div>
+				)}
 			</div>
 		</nav>
 	);
