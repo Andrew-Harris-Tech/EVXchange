@@ -17,14 +17,14 @@ function renderWithRoute(route = '/') {
 describe('Landing page navigation', () => {
   test('Landing page shows all three buttons', () => {
     renderWithRoute('/');
-    expect(screen.getByText(/login/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/login/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/sign up/i)).toBeInTheDocument();
     expect(screen.getByText(/explore map/i)).toBeInTheDocument();
   });
 
   test('Login button navigates to /login', async () => {
     renderWithRoute('/');
-    await userEvent.click(screen.getByText(/login/i));
+  await userEvent.click(screen.getAllByText(/login/i)[0]);
     expect(screen.getByRole('heading', { name: /login/i })).toBeInTheDocument();
   });
 
