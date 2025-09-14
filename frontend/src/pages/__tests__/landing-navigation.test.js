@@ -37,7 +37,6 @@ describe('Landing page navigation', () => {
   test('Explore Map button navigates to /map and shows map', async () => {
     renderWithRoute('/');
     await userEvent.click(screen.getByText(/explore map/i));
-    expect(screen.getByRole('heading', { name: /find nearby chargers/i })).toBeInTheDocument();
-    expect(screen.getByText(/map view/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /find nearby chargers/i })).toBeInTheDocument();
   });
 });

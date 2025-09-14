@@ -126,19 +126,34 @@ def oauth_callback(provider):
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
-    """Log out the current user"""
+    """
+    POST /auth/logout
+    - Description: Log out the current user.
+    - Auth: Session required
+    - Response: {"message": "Logged out successfully"}
+    """
     logout_user()
     return jsonify({'message': 'Logged out successfully'})
 
 @auth_bp.route('/user')
 @login_required
 def get_current_user():
-    """Get current user information"""
+    """
+    GET /auth/user
+    - Description: Get current user information.
+    - Auth: Session required
+    - Response: User object (id, email, name, profile_picture, is_verified)
+    """
     return jsonify(current_user.to_dict())
 
 @auth_bp.route('/providers')
 def get_oauth_providers():
-    """Get available OAuth providers"""
+    """
+    GET /auth/providers
+    - Description: Get available OAuth providers and their login URLs.
+    - Auth: None
+    - Response: {"providers": [{"name": ..., "login_url": ...}]}
+    """
     providers = oauth_service.get_available_providers()
     provider_info = []
     
