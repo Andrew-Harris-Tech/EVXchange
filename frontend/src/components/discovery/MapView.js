@@ -31,13 +31,13 @@ export default function MapView() {
 		}
 	};
 
-	// Fetch ChargeHub locations
-	useEffect(() => {
-		fetch('https://apiv3.chargehub.com/trial/locations')
-			.then(res => res.json())
-			.then(data => setLocations(Array.isArray(data) ? data : []))
-			.catch(() => setLocations([]));
-	}, []);
+		// Fetch ChargeHub locations (proxied to avoid CORS)
+		useEffect(() => {
+			fetch('/chargehub/trial/locations')
+				.then(res => res.json())
+				.then(data => setLocations(Array.isArray(data) ? data : []))
+				.catch(() => setLocations([]));
+		}, []);
 
 		// Get user location on mount and center only once
 		useEffect(() => {
