@@ -11,6 +11,12 @@ logger = logging.getLogger(__name__)
 @api_bp.route('/dashboard')
 @login_required
 def user_dashboard():
+    """
+    GET /api/dashboard
+    - Description: Get user dashboard (bookings, payments, reviews)
+    - Auth: Session required
+    - Response: {"bookings": [...], "payments": [...], "reviews": [...]}
+    """
     user_id = current_user.id
     # Mock bookings for this user
     user_bookings = [
@@ -45,6 +51,14 @@ station_id_counter = [1]
 @api_bp.route('/host/stations', methods=['POST'])
 @login_required
 def create_station():
+    """
+    POST /api/host/stations
+    - Description: Create a new charging station (host only)
+    - Auth: Session required
+    - Request: {"name": str, "lat": float, "lng": float, "address": str}
+    - Response: Station object
+    - Errors: 400 (missing data)
+    """
     data = request.get_json() or {}
     required = ["name", "lat", "lng", "address"]
     if not all(k in data for k in required):
@@ -65,6 +79,12 @@ def create_station():
 @api_bp.route('/host/stations', methods=['GET'])
 @login_required
 def list_host_stations():
+    """
+    GET /api/host/stations
+    - Description: List all stations for the current host
+    - Auth: Session required
+    - Response: {"stations": [...]}
+    """
     host_id = current_user.id if hasattr(current_user, 'id') else 1
     host_stations = [s for s in stations_db if s["host_id"] == host_id]
     return jsonify({"stations": host_stations})
@@ -72,6 +92,14 @@ def list_host_stations():
 @api_bp.route('/host/stations/<int:station_id>', methods=['PUT'])
 @login_required
 def update_station(station_id):
+    """
+    PUT /api/host/stations/<station_id>
+    - Description: Update a station (host only)
+    - Auth: Session required
+    - Request: Partial station object
+    - Response: Updated station object
+    - Errors: 404 (not found)
+    """
     host_id = current_user.id if hasattr(current_user, 'id') else 1
     station = next((s for s in stations_db if s["station_id"] == station_id and s["host_id"] == host_id), None)
     if not station:
@@ -85,6 +113,13 @@ def update_station(station_id):
 @api_bp.route('/host/stations/<int:station_id>', methods=['DELETE'])
 @login_required
 def delete_station(station_id):
+    """
+    DELETE /api/host/stations/<station_id>
+    - Description: Delete a station (host only)
+    - Auth: Session required
+    - Response: 204 No Content
+    - Errors: 404 (not found)
+    """
     host_id = current_user.id if hasattr(current_user, 'id') else 1
     idx = next((i for i, s in enumerate(stations_db) if s["station_id"] == station_id and s["host_id"] == host_id), None)
     if idx is None:
@@ -98,6 +133,14 @@ bookings_db = []  # In-memory mock for bookings
 # --- Booking Endpoints ---
 @api_bp.route('/bookings/', methods=['POST'])
 def create_booking():
+    """
+    POST /api/bookings/
+    - Description: Create a new booking
+    - Auth: None (should be session, see code)
+    - Request: {"station_id": int, "user_id": int, "start_time": str, "end_time": str}
+    - Response: {"booking_id": int, "status": "confirmed"}
+    - Errors: 400 (missing/invalid), 409 (overlap)
+    """
     data = request.get_json() or {}
     required = ["station_id", "user_id", "start_time", "end_time"]
     if not all(k in data for k in required):
@@ -125,6 +168,14 @@ def create_booking():
 
 @api_bp.route('/stations/<int:station_id>/availability')
 def station_availability(station_id):
+    """
+    GET /api/stations/<station_id>/availability?date=YYYY-MM-DD
+    - Description: Get available booking slots for a station on a given date
+    - Auth: None
+    - Query: date (ISO string)
+    - Response: {"available_slots": [{"start": str, "end": str}]}
+    - Errors: 400 (missing/invalid date)
+    """
     date_str = request.args.get("date")
     if not date_str:
         return jsonify({"error": "Missing date parameter"}), 400
@@ -151,20 +202,37 @@ def station_availability(station_id):
 
 @api_bp.route('/health')
 def health_check():
-    """Health check endpoint"""
+    """
+    GET /api/health
+    - Description: API health check
+    - Auth: None
+    - Response: {"status": "healthy", "message": "evxchange API is running"}
+    """
     return jsonify({'status': 'healthy', 'message': 'evxchange API is running'})
 
 @api_bp.route('/profile')
 @login_required
 def get_profile():
-    """Get current user profile"""
+    """
+    GET /api/profile
+    - Description: Get current user profile
+    - Auth: Session required
+    - Response: User object
+    """
     return jsonify(current_user.to_dict())
 
 
 # --- New endpoint: Nearby Charging Stations ---
 @api_bp.route('/nearby_stations')
 def nearby_stations():
-    """Return a list of nearby charging stations for given lat/lng (mock data)"""
+    """
+    GET /api/nearby_stations?lat=...&lng=...
+    - Description: Return a list of nearby charging stations for given lat/lng
+    - Auth: None
+    - Query: lat, lng (float)
+    - Response: {"stations": [...]}
+    - Errors: 400 (invalid/missing lat/lng)
+    """
     lat = request.args.get('lat')
     lng = request.args.get('lng')
     try:
@@ -197,6 +265,14 @@ def nearby_stations():
 # --- Stripe Payment Endpoints ---
 @api_bp.route('/payments/checkout', methods=['POST'])
 def create_checkout_session():
+    """
+    POST /api/payments/checkout
+    - Description: Create a Stripe checkout session for a booking
+    - Auth: None
+    - Request: {"booking_id": int, "amount": int, "currency": str, "success_url": str, "cancel_url": str}
+    - Response: {"checkout_url": str}
+    - Errors: 400 (missing/invalid, Stripe error)
+    """
     data = request.get_json() or {}
     required = ["booking_id", "amount", "currency", "success_url", "cancel_url"]
     if not all(k in data for k in required):
@@ -225,6 +301,14 @@ def create_checkout_session():
 
 @api_bp.route('/payments/webhook', methods=['POST'])
 def stripe_webhook():
+    """
+    POST /api/payments/webhook
+    - Description: Stripe webhook handler (for Stripe use only)
+    - Auth: None
+    - Request: Stripe event payload
+    - Response: {"status": "success"}
+    - Errors: 400 (invalid payload/signature)
+    """
     payload = request.data
     sig_header = request.headers.get('Stripe-Signature', '')
     endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_dummy")
@@ -248,6 +332,14 @@ review_id_counter = [1]
 @api_bp.route('/bookings/<int:booking_id>/review', methods=['POST'])
 @login_required
 def add_review(booking_id):
+    """
+    POST /api/bookings/<booking_id>/review
+    - Description: Add a review for a booking
+    - Auth: Session required
+    - Request: {"rating": int, "review": str}
+    - Response: Review object
+    - Errors: 400 (missing), 409 (exists)
+    """
     data = request.get_json() or {}
     if "rating" not in data or "review" not in data:
         return jsonify({"error": "Missing rating or review"}), 400
@@ -270,12 +362,26 @@ def add_review(booking_id):
 
 @api_bp.route('/stations/<int:station_id>/reviews', methods=['GET'])
 def get_reviews_for_station(station_id):
+    """
+    GET /api/stations/<station_id>/reviews
+    - Description: List reviews for a station
+    - Auth: None
+    - Response: {"reviews": [...]}
+    """
     station_reviews = [r for r in reviews_db if r["station_id"] == station_id]
     return jsonify({"reviews": station_reviews})
 
 @api_bp.route('/reviews/<int:review_id>', methods=['PUT'])
 @login_required
 def update_review(review_id):
+    """
+    PUT /api/reviews/<review_id>
+    - Description: Update a review
+    - Auth: Session required
+    - Request: {"rating": int, "review": str}
+    - Response: Review object
+    - Errors: 404 (not found)
+    """
     review = next((r for r in reviews_db if r["review_id"] == review_id and r["user_id"] == current_user.id), None)
     if not review:
         return jsonify({"error": "Review not found"}), 404
@@ -289,6 +395,13 @@ def update_review(review_id):
 @api_bp.route('/reviews/<int:review_id>', methods=['DELETE'])
 @login_required
 def delete_review(review_id):
+    """
+    DELETE /api/reviews/<review_id>
+    - Description: Delete a review
+    - Auth: Session required
+    - Response: 204 No Content
+    - Errors: 404 (not found)
+    """
     idx = next((i for i, r in enumerate(reviews_db) if r["review_id"] == review_id and r["user_id"] == current_user.id), None)
     if idx is None:
         return jsonify({"error": "Review not found"}), 404
@@ -297,6 +410,12 @@ def delete_review(review_id):
 
 @api_bp.route('/reviews/<int:review_id>', methods=['GET'])
 def get_review(review_id):
+    """
+    GET /api/reviews/<review_id>
+    - Description: Get a single review
+    - Auth: None
+    - Response: Review object or 404
+    """
     review = next((r for r in reviews_db if r["review_id"] == review_id), None)
     if not review:
         return jsonify({"error": "Review not found"}), 404
@@ -306,5 +425,11 @@ def get_review(review_id):
 @api_bp.route('/geolocation')
 @login_required
 def get_user_geolocation():
+    """
+    GET /api/geolocation
+    - Description: Get current user's geolocation (mock)
+    - Auth: Session required
+    - Response: {"lat": float, "lng": float}
+    """
     # In a real app, use IP or device info; here, return a fixed mock location
     return jsonify({"lat": 37.7749, "lng": -122.4194})
