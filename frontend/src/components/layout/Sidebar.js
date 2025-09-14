@@ -1,15 +1,22 @@
 
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { NAV_LINKS } from './navLinks';
 
-export default function Sidebar({ open, onClose }) {
 	const location = useLocation();
 	const { user, logout } = useAuth();
-	// Only show sidebar entries that are allowed for the user
-	const sidebarLinks = NAV_LINKS.filter(l => l.showInSidebar && (!l.requiresAuth || user)).filter(l => !(l.authAction === 'login' && user));
+	// Group host actions for collapsible submenu
+	const hostLinks = NAV_LINKS.filter(l => [
+		'/host',
+		'/host/add',
+	].includes(l.to) && (!l.requiresAuth || user));
+	const sidebarLinks = NAV_LINKS.filter(l => l.showInSidebar && (!l.requiresAuth || user) && ![
+		'/host',
+		'/host/add',
+	].includes(l.to)).filter(l => !(l.authAction === 'login' && user));
+	const [hostOpen, setHostOpen] = useState(false);
 	return (
 		<>
 			{/* Overlay for mobile */}
@@ -59,10 +66,41 @@ export default function Sidebar({ open, onClose }) {
 									)}
 								</li>
 							))}
+							{/* Collapsible Host Actions */}
+							{hostLinks.length > 0 && (
+								<li>
+									<button
+										className="w-full flex items-center justify-between px-6 py-3 rounded hover:bg-blue-100 transition-colors text-gray-800 font-semibold"
+										onClick={() => setHostOpen(v => !v)}
+										aria-expanded={hostOpen}
+										aria-controls="host-submenu"
+									>
+										Host Actions
+										<span className={`ml-2 transition-transform ${hostOpen ? 'rotate-90' : ''}`}>▶</span>
+									</button>
+									<ul
+										id="host-submenu"
+										className={`pl-4 mt-1 space-y-1 overflow-hidden transition-all duration-300 ${hostOpen ? 'max-h-40' : 'max-h-0'} ${hostOpen ? 'opacity-100' : 'opacity-0'}`}
+										style={{ transitionProperty: 'max-height, opacity' }}
+									>
+										{hostLinks.map(link => (
+											<li key={link.to}>
+												<Link
+													to={link.to}
+													className={`block px-4 py-2 rounded hover:bg-blue-50 transition-colors text-gray-800 ${location.pathname === link.to ? 'bg-blue-200 font-semibold text-blue-900' : ''}`}
+													onClick={onClose}
+													data-testid={`sidebar-link-${link.label.toLowerCase().replace(/ /g, '-')}`}
+												>
+													{link.label}
+												</Link>
+											</li>
+										))}
+									</ul>
+								</li>
+							)}
 						</ul>
 					</nav>
 				</div>
 			</aside>
 		</>
 	);
-}
