@@ -6,8 +6,9 @@ import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '../AuthContext';
 
 describe('Sidebar', () => {
+  const mockUser = { name: 'Test User', email: 'test@example.com', avatar: '' };
+
   it('renders sidebar links inside Router (authenticated)', () => {
-    const mockUser = { name: 'Test User', email: 'test@example.com', avatar: '' };
     render(
       <MemoryRouter>
         <AuthProvider value={{ user: mockUser, login: jest.fn(), logout: jest.fn() }}>
@@ -23,7 +24,6 @@ describe('Sidebar', () => {
   });
 
   it('calls onClose when overlay is clicked', () => {
-    const mockUser = { name: 'Test User', email: 'test@example.com', avatar: '' };
     const onClose = jest.fn();
     render(
       <MemoryRouter>
@@ -33,6 +33,67 @@ describe('Sidebar', () => {
       </MemoryRouter>
     );
     fireEvent.click(screen.getByTestId('sidebar-overlay'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('navigates and closes sidebar when a link is clicked', () => {
+    const onClose = jest.fn();
+    render(
+      <MemoryRouter initialEntries={['/']}> 
+        <AuthProvider value={{ user: mockUser, login: jest.fn(), logout: jest.fn() }}>
+          <Sidebar open={true} onClose={onClose} />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+    const stationsLink = screen.getByTestId('sidebar-link-stations');
+    fireEvent.click(stationsLink);
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('navigates and closes sidebar when a host action is clicked', () => {
+    const onClose = jest.fn();
+    render(
+      <MemoryRouter initialEntries={['/']}> 
+        <AuthProvider value={{ user: mockUser, login: jest.fn(), logout: jest.fn() }}>
+          <Sidebar open={true} onClose={onClose} />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+    // Open host actions
+    const hostButton = screen.getByText(/host actions/i);
+    fireEvent.click(hostButton);
+    const hostDashboardLink = screen.getByTestId('sidebar-link-host-dashboard');
+    fireEvent.click(hostDashboardLink);
+    expect(onClose).toHaveBeenCalled();
+  });
+  it('navigates and closes sidebar when a link is clicked', () => {
+    const onClose = jest.fn();
+    render(
+      <MemoryRouter initialEntries={['/']}> 
+        <AuthProvider value={{ user: mockUser, login: jest.fn(), logout: jest.fn() }}>
+          <Sidebar open={true} onClose={onClose} />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+    const stationsLink = screen.getByTestId('sidebar-link-stations');
+    fireEvent.click(stationsLink);
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('navigates and closes sidebar when a host action is clicked', () => {
+    const onClose = jest.fn();
+    render(
+      <MemoryRouter initialEntries={['/']}> 
+        <AuthProvider value={{ user: mockUser, login: jest.fn(), logout: jest.fn() }}>
+          <Sidebar open={true} onClose={onClose} />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+    // Open host actions
+    const hostButton = screen.getByText(/host actions/i);
+    fireEvent.click(hostButton);
+    const hostDashboardLink = screen.getByTestId('sidebar-link-host-dashboard');
+    fireEvent.click(hostDashboardLink);
     expect(onClose).toHaveBeenCalled();
   });
 });
