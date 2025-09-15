@@ -5,19 +5,21 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { NAV_LINKS } from './navLinks';
 
-	const location = useLocation();
-	const { user, logout } = useAuth();
-	// Group host actions for collapsible submenu
-	const hostLinks = NAV_LINKS.filter(l => [
-		'/host',
-		'/host/add',
-	].includes(l.to) && (!l.requiresAuth || user));
-	const sidebarLinks = NAV_LINKS.filter(l => l.showInSidebar && (!l.requiresAuth || user) && ![
-		'/host',
-		'/host/add',
-	].includes(l.to)).filter(l => !(l.authAction === 'login' && user));
-	const [hostOpen, setHostOpen] = useState(false);
-	return (
+
+function Sidebar({ open, onClose }) {
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  // Group host actions for collapsible submenu
+  const hostLinks = NAV_LINKS.filter(l => [
+    '/host',
+    '/host/add',
+  ].includes(l.to) && (!l.requiresAuth || user));
+  const sidebarLinks = NAV_LINKS.filter(l => l.showInSidebar && (!l.requiresAuth || user) && ![
+    '/host',
+    '/host/add',
+  ].includes(l.to)).filter(l => !(l.authAction === 'login' && user));
+  const [hostOpen, setHostOpen] = useState(false);
+  return (
 		<>
 			{/* Overlay for mobile */}
 			<div
@@ -103,4 +105,7 @@ import { NAV_LINKS } from './navLinks';
 				</div>
 			</aside>
 		</>
-	);
+		);
+	}
+
+	export default Sidebar;
