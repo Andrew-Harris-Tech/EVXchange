@@ -1,6 +1,6 @@
 import pytest
 import responses
-from models.user import User
+from backend.models.user import User
 from backend.app import db
 
 class TestOAuthIntegration:
@@ -172,9 +172,9 @@ class TestOAuthIntegration:
         )
         
         response = client.get('/auth/callback/google?code=bad_code&state=error_test_state')
-        assert response.status_code == 500
+        assert response.status_code == 400
         data = response.get_json()
-        assert 'Authentication failed' in data['error']
+        assert 'Failed to obtain access token' in data['error']
     
     @responses.activate
     def test_user_info_failure_handling(self, client, app):

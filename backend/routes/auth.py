@@ -66,15 +66,22 @@ def oauth_callback(provider):
     try:
         # Exchange code for access token
         redirect_uri = url_for('auth.oauth_callback', provider=provider, _external=True)
-        token_data = oauth_provider.get_access_token(code, redirect_uri)
-        access_token = token_data.get('access_token')
-        
+        try:
+            token_data = oauth_provider.get_access_token(code, redirect_uri)
+        except Exception as e:
+            current_app.logger.error(f'OAuth token exchange error: {str(e)}')
+            return jsonify({'error': 'Failed to obtain access token'}), 400
+        access_token = None
+        if isinstance(token_data, dict):
+            access_token = token_data.get('access_token')
         if not access_token:
             return jsonify({'error': 'Failed to obtain access token'}), 400
         
         # Get user info
         user_info = oauth_provider.get_user_info(access_token)
-        
+        # Require email in user info
+        if not user_info.get('email'):
+            return jsonify({'error': 'Email is required from OAuth provider'}), 400
         # Find or create user
         user = User.find_by_oauth_id(provider, user_info['id'])
         
