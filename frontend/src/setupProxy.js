@@ -15,4 +15,16 @@ module.exports = function(app) {
       changeOrigin: true,
     })
   );
+  // Proxy ChargeHub API requests to avoid CORS in development
+  app.use(
+    '/chargehub',
+    createProxyMiddleware({
+      target: 'https://apiv3.chargehub.com',
+      changeOrigin: true,
+      pathRewrite: {
+        '^/chargehub': '',
+      },
+      secure: false,
+    })
+  );
 };

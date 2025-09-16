@@ -106,6 +106,7 @@ export default function MapView() {
 			.catch(() => setLocations([]));
 	}, []);
 
+
 		// Get user location on mount and center only once
 		useEffect(() => {
 			if (!hasCentered && navigator.geolocation) {
