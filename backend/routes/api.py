@@ -1,4 +1,26 @@
+# --- Proxy for Government of Canada EV Stations API to avoid CORS ---
+@api_bp.route('/external/canada_ev/locations', methods=['GET'])
+def proxy_canada_ev_locations():
+    """
+    Proxies the Government of Canada EV station API to avoid CORS issues on the frontend.
+    """
+    try:
+        url = 'https://services.arcgis.com/zmLUiqh7X11gGV2d/arcgis/rest/services/alt_fuel_stations/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json'
+        resp = requests.get(url, timeout=15)
+        resp.raise_for_status()
+        return jsonify(resp.json())
+    except Exception as e:
+        logger.exception("Failed to fetch Canada EV locations")
+        return jsonify({"features": []}), 502
 import requests
+import os
+import stripe
+from flask import Blueprint, jsonify, request, g
+from flask_login import login_required, current_user
+import logging
+
+api_bp = Blueprint('api', __name__)
+
 # --- Proxy for ChargeHub API to avoid CORS ---
 @api_bp.route('/external/chargehub/locations', methods=['GET'])
 def proxy_chargehub_locations():
@@ -13,12 +35,6 @@ def proxy_chargehub_locations():
     except Exception as e:
         logger.exception("Failed to fetch ChargeHub locations")
         return jsonify([]), 502
-import os
-import stripe
-from flask import Blueprint, jsonify, request, g
-from flask_login import login_required, current_user
-import logging
-api_bp = Blueprint('api', __name__)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

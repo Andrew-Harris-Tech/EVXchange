@@ -72,11 +72,37 @@ export default function MapView() {
 			}
 		};
 
-	// Fetch ChargeHub locations
+
+	// Fetch Government of Canada EV station locations
 	useEffect(() => {
-	fetch('/api/external/chargehub/locations')
+		fetch('/api/external/canada_ev/locations')
 			.then(res => res.json())
-			.then(data => setLocations(Array.isArray(data) ? data : []))
+			.then(data => {
+				// Transform the data to the format expected by the map
+				if (data && Array.isArray(data.features)) {
+					const stations = data.features.map(f => {
+						const attr = f.attributes || {};
+						const geom = f.geometry || {};
+						return {
+							LocID: attr.OBJECTID || attr.Station_ID || attr.FacilityID || Math.random(),
+							LocName: attr.Station_Name || attr.FacilityName || 'EV Station',
+							StreetAddress: attr.Street_Address || attr.Address || '',
+							City: attr.City || '',
+							State: attr.Province || attr.State || '',
+							Zip: attr.Postal_Code || attr.Zip || '',
+							AccessHours: attr.Access_Days_Time || attr.Hours || '',
+							LocScore: null, // Not available
+							Phone: attr.Phone || '',
+							Website: attr.Station_Website || attr.Website || '',
+							Latitude: geom.y,
+							Longitude: geom.x
+						};
+					});
+					setLocations(stations);
+				} else {
+					setLocations([]);
+				}
+			})
 			.catch(() => setLocations([]));
 	}, []);
 

@@ -1,32 +1,121 @@
-import userEvent from '@testing-library/user-event';
-  it('snaps to the nearest public charger when button is clicked', async () => {
-    // Place two locations, one closer to the mocked user location
-    const locations = [
-      {
-        LocID: '1',
-        Latitude: 40.1,
-        Longitude: -74.1,
-        LocName: 'Far Station',
-        StreetAddress: '123 Main St',
-        City: 'Testville',
-        State: 'TS',
-        Zip: '12345',
+const mockCanadaApiResponse = {
+  features: [
+    {
+      attributes: {
+        OBJECTID: 101,
+        Station_Name: 'Canada EV Station',
+        Street_Address: '789 Maple Rd',
+        City: 'Ottawa',
+        Province: 'ON',
+        Postal_Code: 'K1A 0B1',
+        Access_Days_Time: 'Mo-Fr 9am-5pm',
+        Phone: '613-555-7890',
+        Station_Website: 'https://canada.ca/ev-station'
       },
-      {
-        LocID: '2',
-        Latitude: 41.2,
-        Longitude: -75.2,
-        LocName: 'Nearest Station',
-        StreetAddress: '456 Side St',
-        City: 'Elsewhere',
-        State: 'ES',
-        Zip: '67890',
-      }
-    ];
+      geometry: { x: -75.6972, y: 45.4215 }
+    },
+    {
+      attributes: {
+        OBJECTID: 102,
+        Station_Name: 'No Address Station',
+        City: 'Toronto',
+        Province: 'ON',
+        Postal_Code: 'M5V 2T6',
+      },
+      geometry: { x: -79.3832, y: 43.6532 }
+    }
+  ]
+};
 
-    // Mock fetch to return locations
+describe('MapView (Canada EV API)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders markers for Canada EV API locations and shows details in popups', async () => {
     global.fetch = jest.fn().mockResolvedValue({
-      json: () => Promise.resolve(locations)
+      json: () => Promise.resolve(mockCanadaApiResponse)
+    });
+
+    render(<MapView />);
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('marker').length).toBe(2);
+    });
+
+    // Check popup content for first marker
+    expect(screen.getByText('Canada EV Station')).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes('789 Maple Rd'))).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes('Ottawa'))).toBeInTheDocument();
+    expect(screen.getByText((content) => content.match(/Mo-Fr 9am-5pm/))).toBeInTheDocument();
+    expect(screen.getByText((content) => content.match(/613-555-7890/))).toBeInTheDocument();
+    expect(screen.getByText('Website')).toHaveAttribute('href', 'https://canada.ca/ev-station');
+
+    // Check popup content for second marker (with missing optional fields)
+    expect(screen.getByText('No Address Station')).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes('Toronto'))).toBeInTheDocument();
+    // Should not render missing fields for second marker
+    expect(screen.queryByText((content) => content.match(/Hours:/) && content.includes('No Address Station'))).toBeNull();
+    expect(screen.queryByText((content) => content.match(/Phone:/) && content.includes('No Address Station'))).toBeNull();
+    expect(screen.queryByText((content) => content.match(/Website/) && content.includes('No Address Station'))).toBeNull();
+  });
+
+  it('handles API error gracefully and renders no markers (Canada API)', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('API error'));
+
+    render(<MapView />);
+
+    await waitFor(() => {
+      expect(screen.queryAllByTestId('marker').length).toBe(0);
+    });
+  });
+
+  it('handles missing/invalid data from Canada API', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      json: () => Promise.resolve({ not: 'features' })
+    });
+
+    render(<MapView />);
+
+    await waitFor(() => {
+      expect(screen.queryAllByTestId('marker').length).toBe(0);
+    });
+  });
+});
+import userEvent from '@testing-library/user-event';
+
+  it('snaps to the nearest public charger when button is clicked (Canada API)', async () => {
+    // Place two features, one closer to the mocked user location
+    const canadaApiResponse = {
+      features: [
+        {
+          attributes: {
+            OBJECTID: 1,
+            Station_Name: 'Far Station',
+            Street_Address: '123 Main St',
+            City: 'Testville',
+            Province: 'TS',
+            Postal_Code: '12345',
+          },
+          geometry: { y: 40.1, x: -74.1 }
+        },
+        {
+          attributes: {
+            OBJECTID: 2,
+            Station_Name: 'Nearest Station',
+            Street_Address: '456 Side St',
+            City: 'Elsewhere',
+            Province: 'ES',
+            Postal_Code: '67890',
+          },
+          geometry: { y: 41.2, x: -75.2 }
+        }
+      ]
+    };
+
+    // Mock fetch to return Canada API response
+    global.fetch = jest.fn().mockResolvedValue({
+      json: () => Promise.resolve(canadaApiResponse)
     });
 
     // Mock geolocation to return a point closest to the second station
@@ -49,7 +138,6 @@ import userEvent from '@testing-library/user-event';
     // The map center should update to the nearest station (41.2, -75.2)
     // We check that a marker with that position exists (as a proxy for center)
     await waitFor(() => {
-      // The ChangeMapCenter effect will set the map center, but since we mock react-leaflet, we check the marker positions
       const nearestMarker = screen.getAllByTestId('marker').find(m => m.getAttribute('data-position') === JSON.stringify([41.2, -75.2]));
       expect(nearestMarker).toBeTruthy();
     });
@@ -74,94 +162,3 @@ jest.mock('react-leaflet', () => {
   };
 });
 
-const mockLocations = [
-  {
-    LocID: '1',
-    Latitude: 40.1,
-    Longitude: -74.1,
-    LocName: 'Test Station',
-    StreetAddress: '123 Main St',
-    City: 'Testville',
-    State: 'TS',
-    Zip: '12345',
-    AccessHours: '24/7',
-    LocScore: 4.5,
-    Phone: '555-1234',
-    Website: 'https://test.com'
-  },
-  {
-    LocID: '2',
-    Latitude: 41.2,
-    Longitude: -75.2,
-    LocName: 'Second Station',
-    StreetAddress: '456 Side St',
-    City: 'Elsewhere',
-    State: 'ES',
-    Zip: '67890',
-    AccessHours: null,
-    LocScore: null,
-    Phone: null,
-    Website: null
-  }
-];
-
-describe('MapView', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('renders markers for ChargeHub locations and shows details in popups', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      json: () => Promise.resolve(mockLocations)
-    });
-
-    render(<MapView />);
-
-    // Wait for markers to appear
-    await waitFor(() => {
-      expect(screen.getAllByTestId('marker').length).toBe(2);
-    });
-
-  // Check popup content for first marker (robust to nested elements)
-  expect(screen.getByText('Test Station')).toBeInTheDocument();
-  expect(screen.getByText((content) => content.includes('123 Main St'))).toBeInTheDocument();
-  expect(screen.getByText((content) => content.includes('Testville'))).toBeInTheDocument();
-  expect(screen.getByText((content) => content.match(/Hours:\s*24\/7/))).toBeInTheDocument();
-  expect(screen.getByText((content) => content.match(/Score:\s*4.5/))).toBeInTheDocument();
-  expect(screen.getByText((content) => content.match(/555-1234/))).toBeInTheDocument();
-  expect(screen.getByText('Website')).toHaveAttribute('href', 'https://test.com');
-
-  // Check popup content for second marker (with missing optional fields)
-  expect(screen.getByText('Second Station')).toBeInTheDocument();
-  expect(screen.getByText((content) => content.includes('456 Side St'))).toBeInTheDocument();
-  expect(screen.getByText((content) => content.includes('Elsewhere'))).toBeInTheDocument();
-  // Should not render missing fields for second marker
-  expect(screen.queryByText((content) => content.match(/Hours:/) && content.includes('Second Station'))).toBeNull();
-  expect(screen.queryByText((content) => content.match(/Score:/) && content.includes('Second Station'))).toBeNull();
-  expect(screen.queryByText((content) => content.match(/Phone:/) && content.includes('Second Station'))).toBeNull();
-  });
-
-  it('handles API error gracefully and renders no markers', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('API error'));
-
-    render(<MapView />);
-
-    // Wait for effect to run
-    await waitFor(() => {
-      // No markers should be rendered
-      expect(screen.queryAllByTestId('marker').length).toBe(0);
-    });
-  });
-
-  it('handles missing/invalid data from API', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      json: () => Promise.resolve({ not: 'an array' })
-    });
-
-    render(<MapView />);
-
-    await waitFor(() => {
-      expect(screen.queryAllByTestId('marker').length).toBe(0);
-    });
-  });
-});
