@@ -1,3 +1,13 @@
+
+import requests
+import os
+import stripe
+from flask import Blueprint, jsonify, request, g
+from flask_login import login_required, current_user
+import logging
+
+api_bp = Blueprint('api', __name__)
+
 # --- Proxy for Government of Canada EV Stations API to avoid CORS ---
 @api_bp.route('/external/canada_ev/locations', methods=['GET'])
 def proxy_canada_ev_locations():
@@ -12,14 +22,6 @@ def proxy_canada_ev_locations():
     except Exception as e:
         logger.exception("Failed to fetch Canada EV locations")
         return jsonify({"features": []}), 502
-import requests
-import os
-import stripe
-from flask import Blueprint, jsonify, request, g
-from flask_login import login_required, current_user
-import logging
-
-api_bp = Blueprint('api', __name__)
 
 # --- Proxy for ChargeHub API to avoid CORS ---
 @api_bp.route('/external/chargehub/locations', methods=['GET'])
