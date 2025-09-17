@@ -32,7 +32,11 @@ def create_app(config_name='development'):
     if 'test' in config_name.lower():
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///evxchange.db')
+        db_url = os.getenv('DATABASE_URL', 'sqlite:///evxchange.db')
+        # Workaround: patch postgres:// to postgresql:// for SQLAlchemy compatibility
+        if db_url.startswith('postgres://'):
+            db_url = 'postgresql://' + db_url[len('postgres://'):]
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # OAuth Configuration
