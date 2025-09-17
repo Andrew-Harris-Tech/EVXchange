@@ -1,4 +1,6 @@
 import React from 'react';
+
+const iconStyle = { width: 20, height: 20, marginRight: 8, verticalAlign: 'middle' };
 export default function Login() {
 	return (
 		<div className="container mt-5" style={{ maxWidth: 400 }}>
@@ -14,9 +16,15 @@ export default function Login() {
 				</div>
 				<button type="submit" className="btn btn-primary w-100 mb-2">Login</button>
 				<div className="d-flex justify-content-between">
-					<button type="button" className="btn btn-outline-secondary w-100 me-1">Google</button>
-					<button type="button" className="btn btn-outline-primary w-100 mx-1">Facebook</button>
-					<button type="button" className="btn btn-outline-info w-100 ms-1">LinkedIn</button>
+					<button type="button" className="btn btn-outline-secondary w-100 me-1">
+						<img src="/icons/google.svg" alt="Google" style={iconStyle} />Google
+					</button>
+					<button type="button" className="btn btn-outline-primary w-100 mx-1">
+						<img src="/icons/facebook.svg" alt="Facebook" style={iconStyle} />Facebook
+					</button>
+					<button type="button" className="btn btn-outline-info w-100 ms-1">
+						<img src="/icons/linkedin.svg" alt="LinkedIn" style={iconStyle} />LinkedIn
+					</button>
 				</div>
 			</form>
 		</div>
