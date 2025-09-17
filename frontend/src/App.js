@@ -19,6 +19,7 @@ import { useAuth } from './components/AuthContext';
 import Landing from './pages/Landing.jsx';
 import Profile from './pages/Profile.jsx';
 import Login from './pages/Login.jsx';
+import OAuthCallback from './components/auth/OAuthCallback.js';
 import SignUp from './pages/SignUp.jsx';
 
 
@@ -51,6 +52,7 @@ function App() {
             <Route path="/host" element={<HostStations />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
           </Routes>
         </main>
       </div>

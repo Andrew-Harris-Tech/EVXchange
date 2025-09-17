@@ -2,6 +2,11 @@ import React from 'react';
 
 const iconStyle = { width: 20, height: 20, marginRight: 8, verticalAlign: 'middle' };
 export default function Login() {
+	// Helper to redirect to backend OAuth login
+	const handleOAuthLogin = (provider) => {
+		window.location.href = `/api/auth/login/${provider}`;
+	};
+
 	return (
 		<div className="container mt-5" style={{ maxWidth: 400 }}>
 			<h2 className="mb-4 text-center">Sign In</h2>

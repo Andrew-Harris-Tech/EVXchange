@@ -57,7 +57,7 @@ def create_app(config_name='development'):
 
     @login_manager.user_loader
     def load_user(user_id):
-        from models.user import User
+        from backend.models.user import User
         return User.query.get(int(user_id))
 
     # Custom unauthorized handler: 401 for API/JSON, else redirect

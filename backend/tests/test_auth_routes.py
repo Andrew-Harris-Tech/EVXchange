@@ -3,7 +3,7 @@ import responses
 from unittest.mock import patch, MagicMock
 from flask import url_for, session
 from flask_login import current_user
-from models.user import User
+from backend.models.user import User
 from backend.app import db
 from urllib.parse import urlparse
 

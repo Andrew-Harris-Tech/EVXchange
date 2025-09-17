@@ -2,7 +2,7 @@ import os
 import tempfile
 import pytest
 from backend.app import create_app, db
-from models.user import User
+from backend.models.user import User
 
 @pytest.fixture
 def app():
