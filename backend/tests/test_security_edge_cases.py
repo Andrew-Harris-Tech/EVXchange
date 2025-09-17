@@ -1,7 +1,7 @@
 import pytest
 import responses
 from unittest.mock import patch, MagicMock
-from models.user import User
+from backend.models.user import User
 from services.oauth import OAuthService
 from backend.app import db
 
@@ -74,8 +74,8 @@ class TestOAuthSecurity:
         )
         
         response = client.get('/auth/callback/google?code=test_code&state=test_state')
-        # Should still work but with limited user info
-        assert response.status_code in [302, 500]  # May redirect or fail gracefully
+        # Should fail with 400 due to missing required user info
+        assert response.status_code == 400
     
     def test_session_cleanup_on_success(self, client, app):
         """Test that OAuth session data is cleaned up on successful auth"""
@@ -137,9 +137,9 @@ class TestOAuthSecurity:
         )
         
         response = client.get('/auth/callback/google?code=test_code&state=timeout_test')
-        assert response.status_code == 500
+        assert response.status_code == 400
         data = response.get_json()
-        assert 'Authentication failed' in data['error']
+        assert 'Failed to obtain access token' in data['error']
     
     def test_missing_required_user_info(self, client, app):
         """Test handling when OAuth provider doesn't return required user info"""
@@ -268,9 +268,8 @@ class TestOAuthEdgeCases:
         )
         
         response = client.get('/auth/callback/google?code=test_code&state=no_email_test')
-        
         # Should fail because email is required
-        assert response.status_code == 500
+        assert response.status_code == 400
     
     def test_concurrent_oauth_attempts(self, client, app):
         """Test multiple concurrent OAuth attempts"""

@@ -1,12 +1,13 @@
 import React from 'react';
+import OAuthButton from '../components/shared/OAuthButton.jsx';
 
 export default function Login() {
   return (
     <div style={{ padding: 32 }}>
       <h2>Login</h2>
-      <button>Login with Google</button>
-      <button>Login with Facebook</button>
-      <button>Login with LinkedIn</button>
+      <OAuthButton provider="google" />
+      <OAuthButton provider="facebook" />
+      <OAuthButton provider="linkedin" />
     </div>
   );
 }

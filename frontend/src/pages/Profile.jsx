@@ -11,6 +11,11 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <h2>Profile</h2>
+      <img
+        src={user.profile_picture || user.avatar || '/default-avatar.png'}
+        alt="avatar"
+        style={{ width: 80, height: 80, borderRadius: '50%', marginBottom: 16 }}
+      />
       <p><strong>Name:</strong> {user.name}</p>
       <p><strong>Email:</strong> {user.email}</p>
       {/* Add more user info as needed */}
