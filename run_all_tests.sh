@@ -12,6 +12,7 @@ else
   echo "Backend test script not found."
 fi
 
+
 # Run frontend build and tests
 if [ -f frontend/package.json ]; then
   echo "\n🔨 Building frontend..."
@@ -20,4 +21,12 @@ if [ -f frontend/package.json ]; then
   (cd frontend && npm test -- --watchAll=false)
 else
   echo "Frontend not set up or package.json missing."
+fi
+
+# Run mobile deep link parsing tests (pure JS)
+if [ -f scripts/parse-deeplink.test.js ]; then
+  echo "\n🧪 Running mobile deep link parsing tests..."
+  (cd scripts && npx jest parse-deeplink.test.js)
+else
+  echo "Mobile deep link parsing test not found."
 fi

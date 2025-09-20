@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { useAuth } from '../components/AuthContext';
+import { OpenInAppButton } from '../components/shared/OpenInAppButton';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -18,6 +20,7 @@ const Profile = () => {
       />
       <p><strong>Name:</strong> {user.name}</p>
       <p><strong>Email:</strong> {user.email}</p>
+      <OpenInAppButton deepLink="profile">Open in App</OpenInAppButton>
       {/* Add more user info as needed */}
     </div>
   );
