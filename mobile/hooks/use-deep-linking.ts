@@ -31,7 +31,7 @@ export function useDeepLinking(customRouter?: { push: (path: string) => void }) 
   useEffect(() => {
     const handleDeepLink = (event: Linking.EventType) => {
       const route = parseEVXchangeDeepLink(event.url);
-      if (route) router.push(route);
+  if (route) router.push(route as any);
     };
     const subscription = Linking.addEventListener('url', handleDeepLink);
     return () => subscription.remove();

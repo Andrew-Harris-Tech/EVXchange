@@ -47,7 +47,7 @@ if [ "$MODE" = "prod" ]; then
   export FLASK_APP=run.py
   flask run 2>&1 | tee ../backend.log
 else
-  # Development: start Flask and React dev server in parallel
+  # Development: start Flask, React, and optionally Mobile dev server in parallel
   cd backend
   export PYTHONPATH="$(cd .. && pwd)"
   export FLASK_APP=run.py
@@ -58,6 +58,20 @@ else
   npm start 2>&1 | tee ../frontend.log &
   FRONTEND_PID=$!
   cd ..
+
+  # Optionally start mobile app (Expo)
+  if [ -d "mobile" ] && [ -f "mobile/package.json" ]; then
+    echo "\n🚀 Starting mobile app (Expo)..."
+    # Try to open in a new terminal tab if possible, else run in background
+    if command -v gnome-terminal &> /dev/null; then
+      gnome-terminal -- bash -c "cd mobile && npm install && npm start"
+    elif command -v x-terminal-emulator &> /dev/null; then
+      x-terminal-emulator -e "bash -c 'cd mobile && npm install && npm start'"
+    else
+      (cd mobile && npm install && npm start) &
+    fi
+  fi
+
   trap 'kill $BACKEND_PID $FRONTEND_PID' SIGINT SIGTERM
   wait $BACKEND_PID $FRONTEND_PID
 fi
