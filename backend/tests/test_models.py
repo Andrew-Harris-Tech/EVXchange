@@ -37,14 +37,14 @@ class TestUserModel:
             user = User(
                 email="test@example.com",
                 name="Test User",
-                profile_picture="http://example.com/pic.jpg",
+                avatar="http://example.com/pic.jpg",
                 is_verified=True
             )
             db.session.add(user)
             db.session.commit()
             
             user_dict = user.to_dict()
-            expected_keys = {'id', 'email', 'name', 'profile_picture', 'is_verified', 'created_at'}
+            expected_keys = {'id', 'email', 'name', 'avatar', 'is_verified', 'created_at', 'tier', 'role'}
             assert set(user_dict.keys()) == expected_keys
             assert user_dict['email'] == "test@example.com"
             assert user_dict['name'] == "Test User"

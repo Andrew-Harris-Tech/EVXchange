@@ -88,7 +88,7 @@ def oauth_callback(provider):
         if user:
             # Update existing user info
             user.name = user_info.get('name', user.name)
-            user.profile_picture = user_info.get('picture', user.profile_picture)
+            user.avatar = user_info.get('picture', user.avatar)
             if user_info.get('verified_email'):
                 user.is_verified = True
         else:
@@ -98,7 +98,7 @@ def oauth_callback(provider):
                 # Link OAuth account to existing user
                 existing_user.set_oauth_id(provider, user_info['id'])
                 existing_user.name = user_info.get('name', existing_user.name)
-                existing_user.profile_picture = user_info.get('picture', existing_user.profile_picture)
+                existing_user.avatar = user_info.get('picture', existing_user.avatar)
                 if user_info.get('verified_email'):
                     existing_user.is_verified = True
                 user = existing_user
@@ -107,7 +107,7 @@ def oauth_callback(provider):
                 user = User(
                     email=user_info.get('email'),
                     name=user_info.get('name', ''),
-                    profile_picture=user_info.get('picture'),
+                    avatar=user_info.get('picture'),
                     is_verified=user_info.get('verified_email', False)
                 )
                 user.set_oauth_id(provider, user_info['id'])
@@ -117,15 +117,14 @@ def oauth_callback(provider):
         
         # Log in user
         login_user(user)
-        
+        # Store role in session for frontend use
+        session['role'] = user.role
         # Clean up session
         session.pop('oauth_state', None)
         session.pop('oauth_provider', None)
-        
         # Redirect to frontend or return success
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
         return redirect(f'{frontend_url}/dashboard')
-        
     except Exception as e:
         current_app.logger.error(f'OAuth callback error: {str(e)}')
         return jsonify({'error': 'Authentication failed'}), 500
@@ -149,9 +148,12 @@ def get_current_user():
     GET /auth/user
     - Description: Get current user information.
     - Auth: Session required
-    - Response: User object (id, email, name, profile_picture, is_verified)
+    - Response: User object (id, email, name, avatar, is_verified)
     """
-    return jsonify(current_user.to_dict())
+    # Add role to response for clarity
+    user_dict = current_user.to_dict()
+    user_dict['role'] = current_user.role
+    return jsonify(user_dict)
 
 @auth_bp.route('/providers')
 def get_oauth_providers():
