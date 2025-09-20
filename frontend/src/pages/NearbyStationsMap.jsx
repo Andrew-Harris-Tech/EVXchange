@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+import { OpenInAppButton } from '../components/shared/OpenInAppButton';
 
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
@@ -83,6 +85,7 @@ const NearbyStationsMap = () => {
         {stations.map((station) => (
           <li key={station.id}>
             <strong>{station.name}</strong> — {station.address}
+            <OpenInAppButton deepLink={`station/${station.id}`}>Open in App</OpenInAppButton>
           </li>
         ))}
       </ul>
