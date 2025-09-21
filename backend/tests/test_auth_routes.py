@@ -7,6 +7,36 @@ from backend.models.user import User
 from backend.app import db
 from urllib.parse import urlparse
 
+# Test setting password after OAuth verification
+
+def test_set_password_after_oauth(client, app):
+    # Create a user and simulate OAuth login
+    with app.app_context():
+        from backend.models.user import User
+        from backend.app import db
+        user = User(email='test@example.com', name='Test User', is_verified=True, google_id='123456789')
+        db.session.add(user)
+        db.session.commit()
+        db.session.refresh(user)
+        user_id = user.id
+
+    # Log in the user (simulate OAuth session)
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user_id)  # Flask-Login uses _user_id
+        sess['_fresh'] = True  # Mark session as fresh for Flask-Login
+
+    # Set password (follow redirects to catch login-required redirects)
+    response = client.post('/auth/set-password', json={'password': 'newpassword'}, follow_redirects=True)
+    # Accept either 200 (success) or 401 (unauthenticated) for debugging
+    assert response.status_code == 200, f"Unexpected status: {response.status_code}, data: {response.data}"
+    assert response.get_json()['message'] == 'Password set successfully'
+
+    # Password should be set and check_password should work
+    with app.app_context():
+        user = User.query.get(user_id)
+        assert user.check_password('newpassword')
+
+
 class TestAuthRoutes:
     """Test cases for authentication routes"""
     

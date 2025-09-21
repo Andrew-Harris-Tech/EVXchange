@@ -48,8 +48,18 @@ export FACEBOOK_APP_SECRET="dummy-facebook-app-secret"
 export LINKEDIN_CLIENT_ID="test-linkedin-client-id"
 export LINKEDIN_CLIENT_SECRET="dummy-linkedin-client-secret"
 
-# Create test database if needed
-echo "🗄️  Setting up test database..."
+
+# Run Alembic migrations before tests
+echo "🗄️  Setting up test database and running migrations..."
+ALEMBIC_CONFIG="alembic.ini"
+if [ ! -f "$ALEMBIC_CONFIG" ] && [ -f "migrations/alembic.ini" ]; then
+    ALEMBIC_CONFIG="migrations/alembic.ini"
+fi
+if [ -f "venv/bin/alembic" ]; then
+    venv/bin/alembic --config $ALEMBIC_CONFIG upgrade head 2>&1 | tee ../alembic_test.log
+elif command -v alembic &> /dev/null; then
+    alembic --config $ALEMBIC_CONFIG upgrade head 2>&1 | tee ../alembic_test.log
+fi
 export FLASK_APP=run.py
 export FLASK_ENV=testing
 

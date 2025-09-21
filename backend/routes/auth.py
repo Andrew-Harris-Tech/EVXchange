@@ -1,3 +1,5 @@
+
+
 import os
 import secrets
 from flask import Blueprint, request, redirect, url_for, session, jsonify, current_app
@@ -6,9 +8,67 @@ from backend.models.user import User
 from backend.services.oauth import OAuthService
 from backend.app import db
 
-
 auth_bp = Blueprint('auth', __name__)
 oauth_service = OAuthService()
+
+# Set password after OAuth verification
+@auth_bp.route('/set-password', methods=['POST'])
+@login_required
+def set_password():
+    """
+    POST /auth/set-password
+    - Description: Set a password for email login after OAuth verification.
+    - Request: {"password": "..."}
+    - Auth: User must be logged in via OAuth
+    - Response: {"message": "Password set successfully"}
+    """
+    data = request.get_json()
+    if not data or 'password' not in data:
+        return jsonify({'error': 'Password required'}), 400
+    password = data['password']
+    current_user.set_password(password)
+    db.session.commit()
+    return jsonify({'message': 'Password set successfully'})
+
+# Email login route (must be after auth_bp is defined)
+@auth_bp.route('/email-login', methods=['POST'])
+def email_login():
+    """
+    POST /auth/email-login
+    - Description: Login by email only (no password).
+    - Only allows:
+        * Admin user (role='admin')
+        * Any user who is_verified=True (i.e., has previously verified via OAuth)
+    - Request: {"email": "..."}
+    - Response: User object (id, email, name, avatar, is_verified, role)
+    """
+    data = request.get_json()
+    if not data or 'email' not in data:
+        return jsonify({'error': 'Email required'}), 400
+    email = data['email'].strip().lower()
+    password = data.get('password')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'No user found with that email'}), 404
+
+    # Only allow admin or previously verified users
+    if user.role == 'admin' or user.is_verified:
+        # If user is already authenticated via OAuth (session), allow login without password
+        oauth_logged_in = False
+        if session.get('_user_id') and session.get('role') == user.role:
+            oauth_logged_in = True
+        # If not logged in, require password if user has a password set
+        if not oauth_logged_in:
+            if user.password_hash:
+                if not password:
+                    return jsonify({'error': 'Password required'}), 400
+                if not user.check_password(password):
+                    return jsonify({'error': 'Invalid password'}), 403
+        login_user(user)
+        session['role'] = user.role
+        return jsonify(user.to_dict())
+    return jsonify({'error': 'Email login not allowed for this user. Please login with OAuth first.'}), 403
+
 
 # Provider-less login route for Flask-Login redirects
 @auth_bp.route('/login')
