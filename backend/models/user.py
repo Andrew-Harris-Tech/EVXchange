@@ -11,7 +11,9 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    profile_picture = db.Column(db.String(200))
+    avatar = db.Column(db.String(200))
+    tier = db.Column(db.String(20), default='free')  # 'free' or 'pro'
+    role = db.Column(db.String(20), default='user')  # 'user' or 'admin'
     
     # OAuth provider information
     google_id = db.Column(db.String(100), unique=True)
@@ -35,7 +37,9 @@ class User(UserMixin, db.Model):
             'id': self.id,
             'email': self.email,
             'name': self.name,
-            'profile_picture': self.profile_picture,
+            'avatar': self.avatar,
+            'tier': self.tier,
+            'role': self.role,
             'is_verified': self.is_verified,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }

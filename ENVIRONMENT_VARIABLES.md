@@ -1,4 +1,10 @@
+
 # .env Required Values
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD`:
+  Used to seed the initial admin user in the database. Default: admin@evxchange.com / supersecurepassword
+
+- `User roles`:
+  The system supports user roles (`user`, `admin`). The admin user is seeded at setup; all others default to `user`.
 
 **[Back to Project Wiki](PROJECT_WIKI.md)**
 

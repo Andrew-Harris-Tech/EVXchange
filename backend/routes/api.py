@@ -6,7 +6,39 @@ from flask import Blueprint, jsonify, request, g
 from flask_login import login_required, current_user
 import logging
 
+
 api_bp = Blueprint('api', __name__)
+
+
+from functools import wraps
+
+api_bp = Blueprint('api', __name__)
+
+# --- Admin-only Middleware ---
+def admin_required(f):
+    from flask_login import current_user
+    from flask import jsonify
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not hasattr(current_user, 'role') or current_user.role != 'admin':
+            return jsonify({'error': 'Forbidden: admin access required'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- Example Admin Endpoint ---
+@api_bp.route('/admin/ping', methods=['GET'])
+@login_required
+@admin_required
+def admin_ping():
+    """
+    GET /api/admin/ping
+    - Description: Simple admin-only endpoint for testing
+    - Auth: Admin session required
+    - Response: {"message": "pong"}
+    - Errors: 403 (Forbidden)
+    """
+    from flask import jsonify
+    return jsonify({'message': 'pong'})
 
 # --- Proxy for Government of Canada EV Stations API to avoid CORS ---
 @api_bp.route('/external/canada_ev/locations', methods=['GET'])
@@ -243,16 +275,40 @@ def health_check():
     """
     return jsonify({'status': 'healthy', 'message': 'evxchange API is running'})
 
-@api_bp.route('/profile')
+
+# --- Profile Endpoints ---
+from backend.models.user import User
+
+@api_bp.route('/profile', methods=['GET', 'PUT'])
 @login_required
-def get_profile():
+def profile():
     """
-    GET /api/profile
-    - Description: Get current user profile
-    - Auth: Session required
-    - Response: User object
+    GET /api/profile: Get current user profile (all fields)
+    PUT /api/profile: Update editable fields of current user profile
+    - Editable fields: all columns except id, email, role, tier, created_at, updated_at, oauth ids
+    - Returns: updated user object
     """
-    return jsonify(current_user.to_dict())
+    user: User = current_user
+    if request.method == 'GET':
+        # Dynamically return all fields
+        return jsonify(user.to_dict())
+
+    # PUT: update editable fields
+    data = request.get_json(force=True)
+    # Get all column names from User model
+    editable_fields = [
+        c.name for c in User.__table__.columns
+        if c.name not in ('id', 'email', 'role', 'tier', 'created_at', 'updated_at', 'google_id', 'facebook_id', 'linkedin_id')
+    ]
+    updated = False
+    for field in editable_fields:
+        if field in data:
+            setattr(user, field, data[field])
+            updated = True
+    if updated:
+        from backend.app import db
+        db.session.commit()
+    return jsonify(user.to_dict())
 
 
 # --- New endpoint: Nearby Charging Stations ---

@@ -58,19 +58,29 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+
 ### 2. Set Up Environment Variables
 ```bash
 # Copy the example environment file
 cp ../config/.env.example .env
 
-# Edit .env with your OAuth credentials:
+# Edit .env with your OAuth credentials and admin seeding:
 # GOOGLE_CLIENT_ID=your_google_client_id
 # GOOGLE_CLIENT_SECRET=your_google_client_secret
 # FACEBOOK_APP_ID=your_facebook_app_id
 # FACEBOOK_APP_SECRET=your_facebook_app_secret
 # LINKEDIN_CLIENT_ID=your_linkedin_client_id
 # LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+# ADMIN_EMAIL=admin@evxchange.com
+# ADMIN_PASSWORD=supersecurepassword
 ```
+### User Model Fields
+- `id`, `name`, `email`, `avatar`, `tier` (free/pro), `role` (user/admin)
+
+### API Endpoints
+- `GET /api/profile` - Get current user profile (all fields)
+- `PUT /api/profile` - Update editable profile fields
+- `GET /api/admin/*` - Admin-only endpoints (require `role=admin`)
 
 ### 3. Run Tests
 ```bash

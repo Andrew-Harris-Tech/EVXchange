@@ -6,12 +6,20 @@ EVXchange is a peer-to-peer electric vehicle (EV) charging station platform — 
 
 ## 🚀 Features
 
-- 🔐 **Authentication** via LinkedIn, Google, or Facebook
+- 🔐 **Authentication** via LinkedIn, Google, or Facebook (with user/admin roles)
 - 🗺️ **Google Maps integration** to explore nearby chargers
 - 🧾 **Booking system** with availability and pricing
 - 💳 **Stripe payments** for secure transactions
 - ⭐ **Ratings & reviews** for transparency and trust
-- 🧑‍💻 **Flask backend** with RESTful API
+- 🧑‍💻 **Flask backend** with RESTful API (admin-only endpoints, dynamic user profiles)
+## 👤 User Roles & Profiles
+
+- Users have roles: `user` (default) or `admin` (seeded from `.env`)
+- Admins can access special dashboard and endpoints
+- Profile page allows editing name and avatar; new fields appear automatically as the model evolves
+## 🛠️ Admin Seeding
+
+The initial admin user is seeded using `ADMIN_EMAIL` and `ADMIN_PASSWORD` from your `.env` file. All other users default to role `user`.
 - ⚛️ **React frontend** for fast, modern UI
 
 ---

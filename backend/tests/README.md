@@ -1,3 +1,7 @@
+## Admin Seeding & Role-Based Access
+
+- Tests verify admin user is seeded from environment variables
+- Role-based access control is tested for admin-only endpoints
 # evxchange OAuth Authentication Tests
 
 This directory contains comprehensive unit and integration tests for the evxchange OAuth authentication system supporting Google, Facebook, and LinkedIn login.

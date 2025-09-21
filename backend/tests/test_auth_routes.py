@@ -152,7 +152,7 @@ class TestAuthRoutes:
         with app.app_context():
             user = User.query.filter_by(email='existing@gmail.com').first()
             assert user.name == 'Updated Name'
-            assert user.profile_picture == 'https://example.com/newpic.jpg'
+            assert user.avatar == 'https://example.com/newpic.jpg'
     
     def test_oauth_callback_invalid_state(self, client):
         """Test OAuth callback with invalid state parameter"""

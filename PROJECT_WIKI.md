@@ -1,3 +1,9 @@
+- [Environment Variables & Setup](ENVIRONMENT_VARIABLES.md)
++ [Environment Variables & Setup](ENVIRONMENT_VARIABLES.md) (now includes admin seeding)
+## New Features
+- Dynamic user profile fields (auto-updating with model)
+- Admin user seeding and role-based access control
+- Admin-only endpoints: `/api/admin/*`
 # EVXchange Functionality Index
 
 This wiki provides an overview of all major features implemented in the EVXchange project. Each section links to a dedicated markdown file with details, API endpoints, and testing notes.
