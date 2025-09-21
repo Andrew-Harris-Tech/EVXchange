@@ -6,7 +6,39 @@ from flask import Blueprint, jsonify, request, g
 from flask_login import login_required, current_user
 import logging
 
+
 api_bp = Blueprint('api', __name__)
+
+
+from functools import wraps
+
+api_bp = Blueprint('api', __name__)
+
+# --- Admin-only Middleware ---
+def admin_required(f):
+    from flask_login import current_user
+    from flask import jsonify
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not hasattr(current_user, 'role') or current_user.role != 'admin':
+            return jsonify({'error': 'Forbidden: admin access required'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- Example Admin Endpoint ---
+@api_bp.route('/admin/ping', methods=['GET'])
+@login_required
+@admin_required
+def admin_ping():
+    """
+    GET /api/admin/ping
+    - Description: Simple admin-only endpoint for testing
+    - Auth: Admin session required
+    - Response: {"message": "pong"}
+    - Errors: 403 (Forbidden)
+    """
+    from flask import jsonify
+    return jsonify({'message': 'pong'})
 
 # --- Proxy for Government of Canada EV Stations API to avoid CORS ---
 @api_bp.route('/external/canada_ev/locations', methods=['GET'])

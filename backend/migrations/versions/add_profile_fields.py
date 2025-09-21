@@ -4,6 +4,12 @@ Revision ID: add_profile_fields
 Revises: 9d3dbe5fc0c0
 Create Date: 2025-09-20
 """
+
+# Alembic identifiers
+revision = 'add_profile_fields'
+down_revision = '9d3dbe5fc0c0'
+branch_labels = None
+depends_on = None
 from alembic import op
 import sqlalchemy as sa
 

@@ -63,11 +63,13 @@ backend/
 - ✅ **Database Security** - Unique constraints and data integrity
 
 ### User Management
-- ✅ **User Model** - Complete user profile management
+- ✅ **User Model** - Complete user profile management, now includes `avatar`, `tier` (free/pro), and `role` (user/admin)
 - ✅ **OAuth Linking** - Multiple OAuth providers per user
 - ✅ **Profile Updates** - Automatic profile updates from OAuth
 - ✅ **Email Verification** - OAuth provider email verification
 - ✅ **User Serialization** - JSON API responses
+- ✅ **Admin Seeding** - Admin user is seeded from `ADMIN_EMAIL`/`ADMIN_PASSWORD` in `.env`
+- ✅ **Role in Session** - User `role` is included in session and API responses for frontend/admin UI
 
 ## 🧪 Test Coverage
 

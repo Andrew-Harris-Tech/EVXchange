@@ -1,16 +1,14 @@
 # dev_seed.py: Populate the dev database with sample users, cars, and stations
-from backend.app import db
+import os
+from backend.app import create_app, db
 from models import User, Car, Station
 
-def seed_dev_data():
-    from backend.app import create_app
-    app = create_app('development')
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
 
+def seed_dev_data(app):
+    # Drop and recreate all tables
+    db.drop_all()
+    db.create_all()
 
-    import os
     admin_email = os.environ.get('ADMIN_EMAIL', 'admin@evxchange.com')
     admin_password = os.environ.get('ADMIN_PASSWORD', 'supersecurepassword')
     admin = User(email=admin_email, name='Admin', is_verified=True, role='admin')
@@ -35,6 +33,11 @@ def seed_dev_data():
     db.session.commit()
 
     print('Sample dev data seeded!')
-
 if __name__ == '__main__':
-    seed_dev_data()
+    # Use DATABASE_URL_DEV if set, else fallback to DATABASE_URL
+    dev_db_url = os.environ.get('DATABASE_URL_DEV')
+    app = create_app('development')
+    if dev_db_url:
+        app.config['SQLALCHEMY_DATABASE_URI'] = dev_db_url
+    with app.app_context():
+        seed_dev_data(app)
